@@ -27,10 +27,17 @@ export async function GET(request: NextRequest) {
   }
 
   // "Today" computed in the mosque's own timezone, not the server's.
-  const todayInMosqueTz = new Date(
-    new Date().toLocaleString("en-US", { timeZone: mosque.timezone })
-  );
-  const dateStr = todayInMosqueTz.toISOString().substring(0, 10);
+  // Use Intl.DateTimeFormat to get the correct YYYY-MM-DD for that timezone
+  // directly from the current instant, avoiding the classic bug of
+  // round-tripping through toLocaleString + `new Date(...)` (which
+  // re-parses a localized string as if it were UTC and silently shifts
+  // the date near midnight).
+  const dateStr = new Intl.DateTimeFormat("en-CA", {
+    timeZone: mosque.timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date()); // en-CA locale formats as YYYY-MM-DD directly
 
   const { data: prayerRow, error: prayerError } = await supabase
     .from("prayer_times")
