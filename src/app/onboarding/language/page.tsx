@@ -1,0 +1,64 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import OnboardingProgress from "@/components/OnboardingProgress";
+
+const LANGUAGES: Array<{ code: "en" | "ar" | "ur"; nativeLabel: string; englishLabel: string }> = [
+  { code: "en", nativeLabel: "English", englishLabel: "English" },
+  { code: "ar", nativeLabel: "العربية", englishLabel: "Arabic" },
+  { code: "ur", nativeLabel: "اردو", englishLabel: "Urdu" },
+];
+
+export default function LanguageSelectionPage() {
+  const router = useRouter();
+  const [selected, setSelected] = useState<"en" | "ar" | "ur" | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const handleContinue = async () => {
+    if (!selected) return;
+    setSaving(true);
+    await fetch("/api/onboarding", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ language: selected }),
+    });
+    router.push("/onboarding/province");
+  };
+
+  return (
+    <div className="min-h-screen bg-sand flex flex-col">
+      <main className="flex-1 max-w-md mx-auto w-full px-6 pt-12 pb-8 flex flex-col">
+        <OnboardingProgress step={1} total={4} />
+
+        <h1 className="font-display text-2xl text-center mb-2">Choose Your Language</h1>
+        <p className="text-center text-ink/60 text-sm mb-8">Select the language you&apos;d like to use</p>
+
+        <div className="space-y-3 flex-1">
+          {LANGUAGES.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => setSelected(lang.code)}
+              className={`w-full text-left p-4 rounded-2xl border-2 transition-colors ${
+                selected === lang.code
+                  ? "border-night-teal bg-night-teal/5"
+                  : "border-sand-dark bg-white hover:border-sage"
+              }`}
+            >
+              <span className="font-display text-lg block">{lang.nativeLabel}</span>
+              {lang.code !== "en" && <span className="text-xs text-ink/50">{lang.englishLabel}</span>}
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={handleContinue}
+          disabled={!selected || saving}
+          className="w-full py-4 rounded-full bg-night-teal text-sand font-medium mt-8 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-night-teal-light transition-colors"
+        >
+          {saving ? "Saving…" : "Continue"}
+        </button>
+      </main>
+    </div>
+  );
+}
