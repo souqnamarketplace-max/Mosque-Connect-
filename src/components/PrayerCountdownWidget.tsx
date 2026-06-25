@@ -1,0 +1,239 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { PrayerTimesPayload, getNextEvent, formatCountdown } from "@/lib/prayerTime";
+
+interface Props {
+  mosqueId: string;
+}
+
+const RADIUS_OUTER = 110;
+const RADIUS_INNER = 84;
+const STROKE = 14;
+const CIRCUMFERENCE_OUTER = 2 * Math.PI * RADIUS_OUTER;
+const CIRCUMFERENCE_INNER = 2 * Math.PI * RADIUS_INNER;
+
+type WidgetState = "loading" | "ready" | "error";
+
+export default function PrayerCountdownWidget({ mosqueId }: Props) {
+  const [payload, setPayload] = useState<PrayerTimesPayload | null>(null);
+  const [state, setState] = useState<WidgetState>("loading");
+  const [now, setNow] = useState(new Date());
+  const [expanded, setExpanded] = useState(false);
+
+  const fetchPayload = useCallback(async () => {
+    setState("loading");
+    try {
+      const res = await fetch(`/api/prayer-times/today?mosque_id=${mosqueId}`);
+      if (!res.ok) throw new Error("fetch failed");
+      const data: PrayerTimesPayload = await res.json();
+      setPayload(data);
+      setState("ready");
+    } catch {
+      setState("error");
+    }
+  }, [mosqueId]);
+
+  useEffect(() => {
+    fetchPayload();
+  }, [fetchPayload]);
+
+  // Tick every second; also re-fetch at local midnight rollover.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newNow = new Date();
+      setNow((prevNow) => {
+        if (newNow.getDate() !== prevNow.getDate()) {
+          fetchPayload();
+        }
+        return newNow;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [fetchPayload]);
+
+  if (state === "loading") {
+    return (
+      <div className="flex justify-center py-8">
+        <div
+          className="w-64 h-64 rounded-full border-[14px] border-sand-dark animate-pulse"
+          aria-label="Loading prayer times"
+        />
+      </div>
+    );
+  }
+
+  if (state === "error" || !payload) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-10 text-center">
+        <p className="text-ink/70">Prayer times unavailable</p>
+        <button
+          onClick={fetchPayload}
+          className="px-4 py-2 rounded-full bg-night-teal text-sand text-sm font-medium hover:bg-night-teal-light transition-colors"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  const nextEvent = getNextEvent(payload, now);
+
+  if (!nextEvent) {
+    return (
+      <div className="text-center py-10 text-ink/70">
+        No more prayers scheduled today.
+      </div>
+    );
+  }
+
+  // Determine the "dominant" countdown: if the next event is an Iqama (i.e. we are
+  // between an Adhan and its Iqama), the inner ring is dominant; otherwise the
+  // outer ring (counting to the next Adhan) is dominant and the inner ring is hidden.
+  const isIqamaDominant = nextEvent.type === "iqama";
+
+  // For the outer (Adhan) ring: find the most recent past Adhan and the next Adhan,
+  // to compute elapsed progress even when Iqama is dominant.
+  const allAdhanTimes = (["fajr", "dhuhr", "asr", "maghrib", "isha"] as const).map((p) => ({
+    prayer: p,
+    at: new Date(`${payload.date}T${payload.adhan[p]}Z`),
+  }));
+  const nextAdhan = allAdhanTimes.find((e) => e.at.getTime() > now.getTime()) ?? allAdhanTimes[allAdhanTimes.length - 1];
+  const prevAdhanIndex = allAdhanTimes.findIndex((e) => e.prayer === nextAdhan.prayer) - 1;
+  const prevAdhan = prevAdhanIndex >= 0 ? allAdhanTimes[prevAdhanIndex] : null;
+
+  const outerTotalMs = prevAdhan ? nextAdhan.at.getTime() - prevAdhan.at.getTime() : 4 * 60 * 60 * 1000;
+  const outerElapsedMs = prevAdhan ? now.getTime() - prevAdhan.at.getTime() : 0;
+  const outerProgress = isIqamaDominant ? 1 : Math.min(1, Math.max(0, outerElapsedMs / outerTotalMs));
+
+  const msRemaining = nextEvent.at.getTime() - now.getTime();
+  const dominantTotalMs = isIqamaDominant
+    ? nextEvent.at.getTime() - (prevAdhan ? nextAdhan.at.getTime() - (nextAdhan.at.getTime() - now.getTime()) : 0)
+    : outerTotalMs;
+  const innerProgress = isIqamaDominant
+    ? Math.min(1, Math.max(0, 1 - msRemaining / Math.max(dominantTotalMs, 1)))
+    : 0;
+
+  const isUrgent = msRemaining < 10 * 60 * 1000;
+  const isCritical = msRemaining < 60 * 1000;
+  const ringColor = isCritical ? "var(--color-urgent)" : isUrgent ? "var(--color-gold)" : "var(--color-night-teal)";
+
+  const outerDashoffset = CIRCUMFERENCE_OUTER * (1 - outerProgress);
+  const innerDashoffset = CIRCUMFERENCE_INNER * (1 - innerProgress);
+
+  return (
+    <div className="flex flex-col items-center">
+      <button
+        onClick={() => setExpanded(true)}
+        className="relative w-64 h-64 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-full"
+        aria-label="View full prayer schedule"
+      >
+        <svg width="256" height="256" viewBox="0 0 256 256" className="-rotate-90">
+          {/* Outer track */}
+          <circle cx="128" cy="128" r={RADIUS_OUTER} fill="none" stroke="var(--color-sand-dark)" strokeWidth={STROKE} />
+          {/* Outer progress (Adhan countdown) */}
+          <circle
+            cx="128"
+            cy="128"
+            r={RADIUS_OUTER}
+            fill="none"
+            stroke={ringColor}
+            strokeWidth={STROKE}
+            strokeLinecap="round"
+            strokeDasharray={CIRCUMFERENCE_OUTER}
+            strokeDashoffset={outerDashoffset}
+            className="transition-[stroke-dashoffset] duration-1000 ease-linear"
+          />
+          {isIqamaDominant && (
+            <>
+              {/* Inner track */}
+              <circle cx="128" cy="128" r={RADIUS_INNER} fill="none" stroke="var(--color-sand-dark)" strokeWidth={STROKE * 0.7} />
+              {/* Inner progress (Iqama countdown) */}
+              <circle
+                cx="128"
+                cy="128"
+                r={RADIUS_INNER}
+                fill="none"
+                stroke="var(--color-sage)"
+                strokeWidth={STROKE * 0.7}
+                strokeLinecap="round"
+                strokeDasharray={CIRCUMFERENCE_INNER}
+                strokeDashoffset={innerDashoffset}
+                className="transition-[stroke-dashoffset] duration-1000 ease-linear"
+              />
+            </>
+          )}
+        </svg>
+
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="font-display text-2xl text-ink">{nextEvent.label}</span>
+          <span
+            className="font-display text-4xl tabular-nums mt-1"
+            style={{ color: ringColor }}
+          >
+            {formatCountdown(msRemaining)}
+          </span>
+          <span className="text-xs uppercase tracking-wide text-ink/60 mt-1">
+            until {nextEvent.type === "adhan" ? "Adhan" : "Iqama"}
+          </span>
+        </div>
+      </button>
+
+      {expanded && (
+        <ScheduleSheet payload={payload} nextEvent={nextEvent} onClose={() => setExpanded(false)} />
+      )}
+    </div>
+  );
+}
+
+function ScheduleSheet({
+  payload,
+  nextEvent,
+  onClose,
+}: {
+  payload: PrayerTimesPayload;
+  nextEvent: NonNullable<ReturnType<typeof getNextEvent>>;
+  onClose: () => void;
+}) {
+  const prayers: Array<{ code: "fajr" | "dhuhr" | "asr" | "maghrib" | "isha"; label: string }> = [
+    { code: "fajr", label: "Fajr" },
+    { code: "dhuhr", label: payload.isJumuah ? "Jumu'ah" : "Dhuhr" },
+    { code: "asr", label: "Asr" },
+    { code: "maghrib", label: "Maghrib" },
+    { code: "isha", label: "Isha" },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40" onClick={onClose}>
+      <div
+        className="w-full max-w-md bg-sand rounded-t-3xl p-6 pb-10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-10 h-1.5 bg-sand-dark rounded-full mx-auto mb-5" />
+        <h3 className="font-display text-xl mb-4">Today&apos;s Schedule</h3>
+        <div className="space-y-2">
+          {prayers.map((p) => {
+            const isCurrent = nextEvent.prayer === p.code;
+            return (
+              <div
+                key={p.code}
+                className={`flex items-center justify-between py-2.5 px-3 rounded-xl ${
+                  isCurrent ? "bg-night-teal/10 border border-night-teal/30" : ""
+                }`}
+              >
+                <span className={`font-display ${isCurrent ? "text-night-teal font-semibold" : ""}`}>{p.label}</span>
+                <div className="flex gap-6 text-sm tabular-nums">
+                  <span className="text-ink/60">{payload.adhan[p.code]?.substring(0, 5)}</span>
+                  <span className="font-medium">{payload.iqama?.[p.code]?.substring(0, 5) ?? "—"}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {payload.isJumuah && payload.khutbahTime && (
+          <p className="text-xs text-ink/60 mt-3">Khutbah begins at {payload.khutbahTime.substring(0, 5)}</p>
+        )}
+      </div>
+    </div>
+  );
+}
