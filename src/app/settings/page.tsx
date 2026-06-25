@@ -4,26 +4,45 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Globe, MapPin, Bell, Moon, Sun, Monitor, ShieldCheck } from "lucide-react";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 interface CurrentSettings {
   language: "en" | "ar" | "ur" | null;
   mosque: { id: string; name: string } | null;
-  city: { id: string; name: string } | null;
-  province: { id: string; name: string; code: string } | null;
+  city: { id: string; name: string; name_ar: string | null; name_ur: string | null } | null;
+  province: { id: string; name: string; name_ar: string | null; name_ur: string | null; code: string } | null;
 }
 
 const LANGUAGE_LABELS: Record<string, string> = { en: "English", ar: "العربية", ur: "اردو" };
-const THEMES: Array<{ value: "light" | "dark" | "system"; label: string; icon: typeof Sun }> = [
-  { value: "light", label: "Light", icon: Sun },
-  { value: "dark", label: "Dark", icon: Moon },
-  { value: "system", label: "System", icon: Monitor },
-];
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { dict, language } = useI18n();
   const [settings, setSettings] = useState<CurrentSettings | null>(null);
   const [theme, setThemeState] = useState<"light" | "dark" | "system">("system");
   const [loading, setLoading] = useState(true);
+
+  const localizedCity = settings?.city
+    ? language === "ar"
+      ? settings.city.name_ar ?? settings.city.name
+      : language === "ur"
+      ? settings.city.name_ur ?? settings.city.name
+      : settings.city.name
+    : null;
+
+  const localizedProvince = settings?.province
+    ? language === "ar"
+      ? settings.province.name_ar ?? settings.province.name
+      : language === "ur"
+      ? settings.province.name_ur ?? settings.province.name
+      : settings.province.name
+    : null;
+
+  const THEMES: Array<{ value: "light" | "dark" | "system"; label: string; icon: typeof Sun }> = [
+    { value: "light", label: dict.settings.themeLight, icon: Sun },
+    { value: "dark", label: dict.settings.themeDark, icon: Moon },
+    { value: "system", label: dict.settings.themeSystem, icon: Monitor },
+  ];
 
   useEffect(() => {
     fetch("/api/onboarding/current")
@@ -44,33 +63,33 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-sand">
       <header className="flex items-center gap-3 px-5 pt-6 pb-4 max-w-md mx-auto">
-        <button onClick={() => router.back()} aria-label="Back" className="text-ink/60 hover:text-ink">
-          <ChevronLeft className="w-6 h-6" />
+        <button onClick={() => router.back()} aria-label={dict.common.back} className="text-ink/60 hover:text-ink">
+          <ChevronLeft className="w-6 h-6 rtl:rotate-180" />
         </button>
-        <h1 className="font-display text-xl">Settings</h1>
+        <h1 className="font-display text-xl">{dict.settings.title}</h1>
       </header>
 
       <main className="max-w-md mx-auto px-5 pb-16 space-y-6">
         {/* Location & Mosque */}
         <div>
-          <h2 className="text-sm font-medium text-ink/60 mb-2">Location & Mosque</h2>
+          <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.settings.locationMosque}</h2>
           <div className="bg-white rounded-2xl divide-y divide-sand-dark">
             <SettingsRow
               icon={MapPin}
-              label="Mosque"
-              value={loading ? "…" : settings?.mosque?.name ?? "Not set"}
+              label={dict.settings.mosque}
+              value={loading ? "…" : settings?.mosque?.name ?? dict.common.notSet}
               href="/onboarding/province"
             />
             <SettingsRow
               icon={MapPin}
-              label="City"
-              value={loading ? "…" : settings?.city?.name ?? "Not set"}
+              label={dict.settings.city}
+              value={loading ? "…" : localizedCity ?? dict.common.notSet}
               href="/onboarding/province"
             />
             <SettingsRow
               icon={MapPin}
-              label="Province"
-              value={loading ? "…" : settings?.province?.name ?? "Not set"}
+              label={dict.settings.province}
+              value={loading ? "…" : localizedProvince ?? dict.common.notSet}
               href="/onboarding/province"
             />
           </div>
@@ -78,11 +97,11 @@ export default function SettingsPage() {
 
         {/* Language */}
         <div>
-          <h2 className="text-sm font-medium text-ink/60 mb-2">Language</h2>
+          <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.settings.languageSection}</h2>
           <div className="bg-white rounded-2xl">
             <SettingsRow
               icon={Globe}
-              label="App Language"
+              label={dict.settings.appLanguage}
               value={loading ? "…" : LANGUAGE_LABELS[settings?.language ?? "en"]}
               href="/onboarding/language"
             />
@@ -91,16 +110,16 @@ export default function SettingsPage() {
 
         {/* Notifications */}
         <div>
-          <h2 className="text-sm font-medium text-ink/60 mb-2">Notifications</h2>
+          <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.settings.notifications}</h2>
           <div className="bg-white rounded-2xl divide-y divide-sand-dark">
-            <SettingsRow icon={Bell} label="Athan Settings" href="/athan-settings" />
-            <SettingsRow icon={Bell} label="Dua Reminder Settings" href="/dua-reminder-settings" />
+            <SettingsRow icon={Bell} label={dict.settings.athanSettings} href="/athan-settings" />
+            <SettingsRow icon={Bell} label={dict.settings.duaReminderSettings} href="/dua-reminder-settings" />
           </div>
         </div>
 
         {/* Theme */}
         <div>
-          <h2 className="text-sm font-medium text-ink/60 mb-2">Theme</h2>
+          <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.settings.theme}</h2>
           <div className="grid grid-cols-3 gap-2">
             {THEMES.map(({ value, label, icon: Icon }) => (
               <button
@@ -119,9 +138,9 @@ export default function SettingsPage() {
 
         {/* Admin */}
         <div>
-          <h2 className="text-sm font-medium text-ink/60 mb-2">Mosque Administration</h2>
+          <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.settings.mosqueAdmin}</h2>
           <div className="bg-white rounded-2xl">
-            <SettingsRow icon={ShieldCheck} label="Admin Login" href="/admin/login" />
+            <SettingsRow icon={ShieldCheck} label={dict.settings.adminLogin} href="/admin/login" />
           </div>
         </div>
       </main>
@@ -145,7 +164,7 @@ function SettingsRow({
       <Icon className="w-4 h-4 text-night-teal flex-shrink-0" />
       <span className="flex-1">{label}</span>
       {value && <span className="text-sm text-ink/50">{value}</span>}
-      <ChevronRight className="w-4 h-4 text-ink/30" />
+      <ChevronRight className="w-4 h-4 text-ink/30 rtl:rotate-180" />
     </Link>
   );
 }

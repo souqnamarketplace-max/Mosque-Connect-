@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { PrayerTimesPayload, getNextEvent, formatCountdown } from "@/lib/prayerTime";
+import { PrayerTimesPayload, getNextEvent, formatCountdown, PrayerCode } from "@/lib/prayerTime";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 interface Props {
   mosqueId: string;
@@ -16,10 +17,19 @@ const CIRCUMFERENCE_INNER = 2 * Math.PI * RADIUS_INNER;
 type WidgetState = "loading" | "ready" | "error";
 
 export default function PrayerCountdownWidget({ mosqueId }: Props) {
+  const { dict } = useI18n();
   const [payload, setPayload] = useState<PrayerTimesPayload | null>(null);
   const [state, setState] = useState<WidgetState>("loading");
   const [now, setNow] = useState(new Date());
   const [expanded, setExpanded] = useState(false);
+
+  const prayerLabels: Record<PrayerCode, string> = {
+    fajr: dict.prayers.fajr,
+    dhuhr: dict.prayers.dhuhr,
+    asr: dict.prayers.asr,
+    maghrib: dict.prayers.maghrib,
+    isha: dict.prayers.isha,
+  };
 
   const fetchPayload = useCallback(async () => {
     setState("loading");
@@ -66,23 +76,23 @@ export default function PrayerCountdownWidget({ mosqueId }: Props) {
   if (state === "error" || !payload) {
     return (
       <div className="flex flex-col items-center gap-3 py-10 text-center">
-        <p className="text-ink/70">Prayer times unavailable</p>
+        <p className="text-ink/70">{dict.home.prayerUnavailable}</p>
         <button
           onClick={fetchPayload}
           className="px-4 py-2 rounded-full bg-night-teal text-sand text-sm font-medium hover:bg-night-teal-light transition-colors"
         >
-          Retry
+          {dict.common.retry}
         </button>
       </div>
     );
   }
 
-  const nextEvent = getNextEvent(payload, now);
+  const nextEvent = getNextEvent(payload, now, prayerLabels, dict.home.jumuah);
 
   if (!nextEvent) {
     return (
       <div className="text-center py-10 text-ink/70">
-        No more prayers scheduled today.
+        {dict.home.noMorePrayers}
       </div>
     );
   }
@@ -174,13 +184,21 @@ export default function PrayerCountdownWidget({ mosqueId }: Props) {
             {formatCountdown(msRemaining)}
           </span>
           <span className="text-xs uppercase tracking-wide text-ink/60 mt-1">
-            until {nextEvent.type === "adhan" ? "Adhan" : "Iqama"}
+            {nextEvent.type === "adhan" ? dict.home.untilAdhan : dict.home.untilIqama}
           </span>
         </div>
       </button>
 
       {expanded && (
-        <ScheduleSheet payload={payload} nextEvent={nextEvent} onClose={() => setExpanded(false)} />
+        <ScheduleSheet
+          payload={payload}
+          nextEvent={nextEvent}
+          prayerLabels={prayerLabels}
+          jumuahLabel={dict.home.jumuah}
+          scheduleTitle={dict.home.todaysSchedule}
+          khutbahLabel={dict.home.khutbahBegins}
+          onClose={() => setExpanded(false)}
+        />
       )}
     </div>
   );
@@ -189,18 +207,26 @@ export default function PrayerCountdownWidget({ mosqueId }: Props) {
 function ScheduleSheet({
   payload,
   nextEvent,
+  prayerLabels,
+  jumuahLabel,
+  scheduleTitle,
+  khutbahLabel,
   onClose,
 }: {
   payload: PrayerTimesPayload;
   nextEvent: NonNullable<ReturnType<typeof getNextEvent>>;
+  prayerLabels: Record<PrayerCode, string>;
+  jumuahLabel: string;
+  scheduleTitle: string;
+  khutbahLabel: string;
   onClose: () => void;
 }) {
-  const prayers: Array<{ code: "fajr" | "dhuhr" | "asr" | "maghrib" | "isha"; label: string }> = [
-    { code: "fajr", label: "Fajr" },
-    { code: "dhuhr", label: payload.isJumuah ? "Jumu'ah" : "Dhuhr" },
-    { code: "asr", label: "Asr" },
-    { code: "maghrib", label: "Maghrib" },
-    { code: "isha", label: "Isha" },
+  const prayers: Array<{ code: PrayerCode; label: string }> = [
+    { code: "fajr", label: prayerLabels.fajr },
+    { code: "dhuhr", label: payload.isJumuah ? jumuahLabel : prayerLabels.dhuhr },
+    { code: "asr", label: prayerLabels.asr },
+    { code: "maghrib", label: prayerLabels.maghrib },
+    { code: "isha", label: prayerLabels.isha },
   ];
 
   return (
@@ -210,7 +236,7 @@ function ScheduleSheet({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="w-10 h-1.5 bg-sand-dark rounded-full mx-auto mb-5" />
-        <h3 className="font-display text-xl mb-4">Today&apos;s Schedule</h3>
+        <h3 className="font-display text-xl mb-4">{scheduleTitle}</h3>
         <div className="space-y-2">
           {prayers.map((p) => {
             const isCurrent = nextEvent.prayer === p.code;
@@ -231,7 +257,7 @@ function ScheduleSheet({
           })}
         </div>
         {payload.isJumuah && payload.khutbahTime && (
-          <p className="text-xs text-ink/60 mt-3">Khutbah begins at {payload.khutbahTime.substring(0, 5)}</p>
+          <p className="text-xs text-ink/60 mt-3">{khutbahLabel} {payload.khutbahTime.substring(0, 5)}</p>
         )}
       </div>
     </div>

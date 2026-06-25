@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("cities")
-    .select("id, name, latitude, longitude, timezone")
+    .select("id, name, name_ar, name_ur, latitude, longitude, timezone")
     .eq("province_id", parsed.data.province_id)
     .order("sort_order", { ascending: true });
 

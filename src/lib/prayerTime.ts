@@ -22,14 +22,6 @@ export interface PrayerTimesPayload {
 
 export type PrayerCode = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
 
-export const PRAYER_LABELS: Record<PrayerCode, string> = {
-  fajr: "Fajr",
-  dhuhr: "Dhuhr",
-  asr: "Asr",
-  maghrib: "Maghrib",
-  isha: "Isha",
-};
-
 export interface NextEvent {
   prayer: PrayerCode;
   type: "adhan" | "iqama";
@@ -56,13 +48,18 @@ function combineDateAndTime(dateStr: string, timeStr: string): Date {
  * inserting the Jumu'ah relabeling where applicable, and returns the
  * single next chronological event relative to `now`.
  */
-export function getNextEvent(payload: PrayerTimesPayload, now: Date): NextEvent | null {
+export function getNextEvent(
+  payload: PrayerTimesPayload,
+  now: Date,
+  prayerLabels: Record<PrayerCode, string>,
+  jumuahLabel: string
+): NextEvent | null {
   const events: NextEvent[] = [];
   const prayers: PrayerCode[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
 
   for (const prayer of prayers) {
     const isJumuahSlot = payload.isJumuah && prayer === "dhuhr";
-    const label = isJumuahSlot ? "Jumu'ah" : PRAYER_LABELS[prayer];
+    const label = isJumuahSlot ? jumuahLabel : prayerLabels[prayer];
 
     events.push({
       prayer,

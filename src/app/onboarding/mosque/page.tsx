@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { ChevronLeft, MapPinned } from "lucide-react";
 import OnboardingProgress from "@/components/OnboardingProgress";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 interface Mosque {
   id: string;
@@ -16,6 +17,7 @@ interface Mosque {
 function MosqueSelectionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { dict } = useI18n();
   const cityId = searchParams.get("city_id");
 
   const [mosques, setMosques] = useState<Mosque[]>([]);
@@ -43,7 +45,7 @@ function MosqueSelectionContent() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => load(pos.coords.latitude, pos.coords.longitude),
-        () => load(), // permission denied or unavailable — load without distance
+        () => load(),
         { timeout: 5000 }
       );
     } else {
@@ -64,16 +66,16 @@ function MosqueSelectionContent() {
   return (
     <div className="min-h-screen bg-sand flex flex-col">
       <header className="max-w-md mx-auto w-full px-6 pt-6">
-        <button onClick={() => router.back()} className="text-ink/60 hover:text-ink" aria-label="Back">
-          <ChevronLeft className="w-6 h-6" />
+        <button onClick={() => router.back()} className="text-ink/60 hover:text-ink" aria-label={dict.common.back}>
+          <ChevronLeft className="w-6 h-6 rtl:rotate-180" />
         </button>
       </header>
 
       <main className="flex-1 max-w-md mx-auto w-full px-6 pt-4 pb-8">
         <OnboardingProgress step={4} total={4} />
 
-        <h1 className="font-display text-2xl text-center mb-2">Select Your Mosque</h1>
-        <p className="text-center text-ink/60 text-sm mb-8">Choose your preferred mosque</p>
+        <h1 className="font-display text-2xl text-center mb-2">{dict.onboarding.mosque.title}</h1>
+        <p className="text-center text-ink/60 text-sm mb-8">{dict.onboarding.mosque.subtitle}</p>
 
         {loading ? (
           <div className="space-y-3">
@@ -82,7 +84,7 @@ function MosqueSelectionContent() {
             ))}
           </div>
         ) : mosques.length === 0 ? (
-          <p className="text-center text-ink/50 py-8">No mosques available for this city yet.</p>
+          <p className="text-center text-ink/50 py-8">{dict.onboarding.mosque.empty}</p>
         ) : (
           <div className="space-y-3">
             {mosques.map((mosque) => (
@@ -98,9 +100,7 @@ function MosqueSelectionContent() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={mosque.logo_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="font-display text-night-teal text-lg">
-                        {mosque.name.charAt(0)}
-                      </span>
+                      <span className="font-display text-night-teal text-lg">{mosque.name.charAt(0)}</span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -117,7 +117,7 @@ function MosqueSelectionContent() {
                   )}
                 </div>
                 {selecting === mosque.id && (
-                  <p className="text-xs text-night-teal mt-2">Setting up your home screen…</p>
+                  <p className="text-xs text-night-teal mt-2">{dict.onboarding.mosque.settingUp}</p>
                 )}
               </button>
             ))}

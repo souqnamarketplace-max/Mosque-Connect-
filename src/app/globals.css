@@ -13,6 +13,16 @@
 
   --font-display: Georgia, "Times New Roman", serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-arabic: "Noto Naskh Arabic", "Geeza Pro", "Segoe UI", system-ui, sans-serif;
+  --font-urdu: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Segoe UI", system-ui, sans-serif;
+}
+
+[dir="rtl"] body {
+  font-family: var(--font-arabic);
+}
+
+html[lang="ur"] body {
+  font-family: var(--font-urdu);
 }
 
 body {

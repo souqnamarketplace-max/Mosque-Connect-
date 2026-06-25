@@ -1,16 +1,21 @@
+"use client";
+
 import Link from "next/link";
 import { Compass, CalendarDays, HandCoins, Radio, Megaphone, Building2 } from "lucide-react";
-
-const ACTIONS = [
-  { href: "/qibla", icon: Compass, label: "Qibla" },
-  { href: "/events", icon: CalendarDays, label: "Events" },
-  { href: "/donate", icon: HandCoins, label: "Donate" },
-  { href: "/live", icon: Radio, label: "Live Stream" },
-  { href: "/announcements", icon: Megaphone, label: "Announcements" },
-  { href: "/mosque", icon: Building2, label: "Mosque Profile" },
-];
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export default function QuickActionsGrid() {
+  const { dict } = useI18n();
+
+  const ACTIONS = [
+    { href: "/qibla", icon: Compass, label: dict.home.quickActions.qibla },
+    { href: "/events", icon: CalendarDays, label: dict.home.quickActions.events },
+    { href: "/donate", icon: HandCoins, label: dict.home.quickActions.donate },
+    { href: "/live", icon: Radio, label: dict.home.quickActions.liveStream },
+    { href: "/announcements", icon: Megaphone, label: dict.home.quickActions.announcements },
+    { href: "/mosque", icon: Building2, label: dict.home.quickActions.mosqueProfile },
+  ];
+
   return (
     <div className="grid grid-cols-3 gap-3">
       {ACTIONS.map(({ href, icon: Icon, label }) => (

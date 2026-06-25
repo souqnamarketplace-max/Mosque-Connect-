@@ -1,0 +1,96 @@
+import type { TranslationDict } from "./en";
+
+const ur: TranslationDict = {
+  common: {
+    back: "واپس",
+    continue: "جاری رکھیں",
+    saving: "محفوظ ہو رہا ہے…",
+    loading: "لوڈ ہو رہا ہے…",
+    retry: "دوبارہ کوشش کریں",
+    notSet: "سیٹ نہیں ہے",
+    settings: "ترتیبات",
+  },
+  onboarding: {
+    language: {
+      title: "اپنی زبان منتخب کریں",
+      subtitle: "وہ زبان منتخب کریں جو آپ استعمال کرنا چاہتے ہیں",
+    },
+    province: {
+      title: "اپنا صوبہ منتخب کریں",
+      subtitle: "آپ کہاں واقع ہیں؟",
+    },
+    city: {
+      title: "اپنا شہر منتخب کریں",
+      subtitle: "اپنا قریب ترین شہر منتخب کریں",
+      empty: "اس صوبے کے لیے ابھی کوئی شہر دستیاب نہیں ہے۔",
+    },
+    mosque: {
+      title: "اپنی مسجد منتخب کریں",
+      subtitle: "اپنی پسندیدہ مسجد منتخب کریں",
+      empty: "اس شہر کے لیے ابھی کوئی مسجد دستیاب نہیں ہے۔",
+      settingUp: "آپ کی ہوم اسکرین تیار کی جا رہی ہے…",
+    },
+  },
+  home: {
+    prayerUnavailable: "نماز کے اوقات دستیاب نہیں ہیں",
+    untilAdhan: "اذان تک",
+    untilIqama: "اقامت تک",
+    todaysSchedule: "آج کا شیڈول",
+    khutbahBegins: "خطبہ شروع ہوگا",
+    jumuah: "جمعہ",
+    noMorePrayers: "آج کے لیے مزید نمازیں مقرر نہیں ہیں۔",
+    quickActions: {
+      qibla: "قبلہ",
+      events: "تقریبات",
+      donate: "عطیہ",
+      liveStream: "لائیو اسٹریم",
+      announcements: "اعلانات",
+      mosqueProfile: "مسجد پروفائل",
+    },
+  },
+  prayers: {
+    fajr: "فجر",
+    dhuhr: "ظہر",
+    asr: "عصر",
+    maghrib: "مغرب",
+    isha: "عشاء",
+  },
+  settings: {
+    title: "ترتیبات",
+    locationMosque: "مقام اور مسجد",
+    mosque: "مسجد",
+    city: "شہر",
+    province: "صوبہ",
+    languageSection: "زبان",
+    appLanguage: "ایپ کی زبان",
+    notifications: "اطلاعات",
+    athanSettings: "اذان کی ترتیبات",
+    duaReminderSettings: "دعا یاد دہانی کی ترتیبات",
+    theme: "تھیم",
+    themeLight: "لائٹ",
+    themeDark: "ڈارک",
+    themeSystem: "سسٹم",
+    mosqueAdmin: "مسجد انتظامیہ",
+    adminLogin: "ایڈمن لاگ ان",
+  },
+  athan: {
+    title: "اذان کی ترتیبات",
+    enable: "اذان فعال کریں",
+    voice: "اذان کی آواز",
+    volume: "والیوم",
+    alertMode: "الرٹ موڈ",
+    sound: "آواز",
+    vibrationOnly: "صرف وائبریشن",
+    notificationOnly: "صرف اطلاع",
+    muted: "خاموش",
+    perPrayer: "ہر نماز کی ترتیبات",
+  },
+  duaReminders: {
+    title: "دعا کی یاد دہانیاں",
+    enable: "یاد دہانیاں فعال کریں",
+    language: "زبان",
+    categories: "یاد دہانی کے زمرے",
+  },
+};
+
+export default ur;

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import OnboardingProgress from "@/components/OnboardingProgress";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 const LANGUAGES: Array<{ code: "en" | "ar" | "ur"; nativeLabel: string; englishLabel: string }> = [
   { code: "en", nativeLabel: "English", englishLabel: "English" },
@@ -12,12 +13,14 @@ const LANGUAGES: Array<{ code: "en" | "ar" | "ur"; nativeLabel: string; englishL
 
 export default function LanguageSelectionPage() {
   const router = useRouter();
+  const { dict, setLanguage } = useI18n();
   const [selected, setSelected] = useState<"en" | "ar" | "ur" | null>(null);
   const [saving, setSaving] = useState(false);
 
   const handleContinue = async () => {
     if (!selected) return;
     setSaving(true);
+    setLanguage(selected); // updates UI immediately (context + cookie)
     await fetch("/api/onboarding", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -31,8 +34,8 @@ export default function LanguageSelectionPage() {
       <main className="flex-1 max-w-md mx-auto w-full px-6 pt-12 pb-8 flex flex-col">
         <OnboardingProgress step={1} total={4} />
 
-        <h1 className="font-display text-2xl text-center mb-2">Choose Your Language</h1>
-        <p className="text-center text-ink/60 text-sm mb-8">Select the language you&apos;d like to use</p>
+        <h1 className="font-display text-2xl text-center mb-2">{dict.onboarding.language.title}</h1>
+        <p className="text-center text-ink/60 text-sm mb-8">{dict.onboarding.language.subtitle}</p>
 
         <div className="space-y-3 flex-1">
           {LANGUAGES.map((lang) => (
@@ -56,7 +59,7 @@ export default function LanguageSelectionPage() {
           disabled={!selected || saving}
           className="w-full py-4 rounded-full bg-night-teal text-sand font-medium mt-8 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-night-teal-light transition-colors"
         >
-          {saving ? "Saving…" : "Continue"}
+          {saving ? dict.common.saving : dict.common.continue}
         </button>
       </main>
     </div>

@@ -1,0 +1,96 @@
+import type { TranslationDict } from "./en";
+
+const ar: TranslationDict = {
+  common: {
+    back: "رجوع",
+    continue: "استمرار",
+    saving: "جارٍ الحفظ…",
+    loading: "جارٍ التحميل…",
+    retry: "إعادة المحاولة",
+    notSet: "غير محدد",
+    settings: "الإعدادات",
+  },
+  onboarding: {
+    language: {
+      title: "اختر لغتك",
+      subtitle: "حدد اللغة التي تريد استخدامها",
+    },
+    province: {
+      title: "اختر مقاطعتك",
+      subtitle: "أين تقع؟",
+    },
+    city: {
+      title: "اختر مدينتك",
+      subtitle: "اختر أقرب مدينة لك",
+      empty: "لا توجد مدن متاحة لهذه المقاطعة حتى الآن.",
+    },
+    mosque: {
+      title: "اختر مسجدك",
+      subtitle: "اختر المسجد الذي تفضله",
+      empty: "لا توجد مساجد متاحة لهذه المدينة حتى الآن.",
+      settingUp: "جارٍ تجهيز شاشتك الرئيسية…",
+    },
+  },
+  home: {
+    prayerUnavailable: "مواقيت الصلاة غير متوفرة",
+    untilAdhan: "حتى الأذان",
+    untilIqama: "حتى الإقامة",
+    todaysSchedule: "جدول اليوم",
+    khutbahBegins: "تبدأ الخطبة في",
+    jumuah: "الجمعة",
+    noMorePrayers: "لا توجد صلوات أخرى مجدولة لهذا اليوم.",
+    quickActions: {
+      qibla: "القبلة",
+      events: "الفعاليات",
+      donate: "تبرع",
+      liveStream: "البث المباشر",
+      announcements: "الإعلانات",
+      mosqueProfile: "ملف المسجد",
+    },
+  },
+  prayers: {
+    fajr: "الفجر",
+    dhuhr: "الظهر",
+    asr: "العصر",
+    maghrib: "المغرب",
+    isha: "العشاء",
+  },
+  settings: {
+    title: "الإعدادات",
+    locationMosque: "الموقع والمسجد",
+    mosque: "المسجد",
+    city: "المدينة",
+    province: "المقاطعة",
+    languageSection: "اللغة",
+    appLanguage: "لغة التطبيق",
+    notifications: "الإشعارات",
+    athanSettings: "إعدادات الأذان",
+    duaReminderSettings: "إعدادات تذكير الدعاء",
+    theme: "المظهر",
+    themeLight: "فاتح",
+    themeDark: "داكن",
+    themeSystem: "النظام",
+    mosqueAdmin: "إدارة المسجد",
+    adminLogin: "تسجيل دخول المسؤول",
+  },
+  athan: {
+    title: "إعدادات الأذان",
+    enable: "تفعيل الأذان",
+    voice: "صوت الأذان",
+    volume: "مستوى الصوت",
+    alertMode: "نوع التنبيه",
+    sound: "صوت",
+    vibrationOnly: "اهتزاز فقط",
+    notificationOnly: "إشعار فقط",
+    muted: "صامت",
+    perPrayer: "إعدادات كل صلاة",
+  },
+  duaReminders: {
+    title: "تذكيرات الدعاء",
+    enable: "تفعيل التذكيرات",
+    language: "اللغة",
+    categories: "فئات التذكير",
+  },
+};
+
+export default ar;

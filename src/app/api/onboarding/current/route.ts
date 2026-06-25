@@ -22,7 +22,7 @@ export async function GET() {
 
   const { data: city } = await supabase
     .from("cities")
-    .select("id, name, province_id")
+    .select("id, name, name_ar, name_ur, province_id")
     .eq("id", mosque.city_id)
     .single();
 
@@ -30,7 +30,7 @@ export async function GET() {
   if (city) {
     const { data: provinceRow } = await supabase
       .from("provinces")
-      .select("id, name, code")
+      .select("id, name, name_ar, name_ur, code")
       .eq("id", city.province_id)
       .single();
     province = provinceRow;
@@ -39,7 +39,7 @@ export async function GET() {
   return NextResponse.json({
     language,
     mosque: { id: mosque.id, name: mosque.name },
-    city: city ? { id: city.id, name: city.name } : null,
+    city: city ? { id: city.id, name: city.name, name_ar: city.name_ar, name_ur: city.name_ur } : null,
     province,
   });
 }

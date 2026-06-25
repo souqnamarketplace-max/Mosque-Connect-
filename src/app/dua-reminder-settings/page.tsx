@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 interface DuaCategory {
   id: string;
@@ -19,18 +20,19 @@ interface DuaPrefs {
   reminder_times: Record<string, string>;
 }
 
-const LANGUAGES: Array<{ code: "en" | "ar" | "ur"; label: string }> = [
-  { code: "en", label: "English" },
-  { code: "ar", label: "العربية" },
-  { code: "ur", label: "اردو" },
-];
-
 export default function DuaReminderSettingsPage() {
   const router = useRouter();
+  const { dict, language } = useI18n();
   const [categories, setCategories] = useState<DuaCategory[]>([]);
   const [prefs, setPrefs] = useState<DuaPrefs | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  const LANGUAGES: Array<{ code: "en" | "ar" | "ur"; label: string }> = [
+    { code: "en", label: "English" },
+    { code: "ar", label: "العربية" },
+    { code: "ur", label: "اردو" },
+  ];
 
   useEffect(() => {
     async function load() {
@@ -71,29 +73,27 @@ export default function DuaReminderSettingsPage() {
   };
 
   if (loading || !prefs) {
-    return <div className="p-6 text-center text-ink/50">Loading settings…</div>;
+    return <div className="p-6 text-center text-ink/50">{dict.common.loading}</div>;
   }
 
   return (
     <div className="min-h-screen bg-sand">
       <header className="flex items-center gap-3 px-5 pt-6 pb-4 max-w-md mx-auto">
-        <button onClick={() => router.back()} aria-label="Back" className="text-ink/60 hover:text-ink">
-          <ChevronLeft className="w-6 h-6" />
+        <button onClick={() => router.back()} aria-label={dict.common.back} className="text-ink/60 hover:text-ink">
+          <ChevronLeft className="w-6 h-6 rtl:rotate-180" />
         </button>
-        <h1 className="font-display text-xl">Dua Reminders</h1>
-        {saving && <span className="text-xs text-ink/40 ml-auto">Saving…</span>}
+        <h1 className="font-display text-xl">{dict.duaReminders.title}</h1>
+        {saving && <span className="text-xs text-ink/40 ms-auto">{dict.common.saving}</span>}
       </header>
 
       <main className="max-w-md mx-auto px-5 pb-16 space-y-6">
-        {/* Master toggle */}
         <div className="flex items-center justify-between bg-white rounded-2xl p-4">
-          <span className="font-medium">Enable Reminders</span>
+          <span className="font-medium">{dict.duaReminders.enable}</span>
           <ToggleSwitch checked={prefs.enabled} onChange={(v) => save({ enabled: v })} />
         </div>
 
-        {/* Language */}
         <div>
-          <h2 className="text-sm font-medium text-ink/60 mb-2">Language</h2>
+          <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.duaReminders.language}</h2>
           <div className="grid grid-cols-3 gap-2">
             {LANGUAGES.map((lang) => (
               <button
@@ -111,26 +111,18 @@ export default function DuaReminderSettingsPage() {
           </div>
         </div>
 
-        {/* Categories */}
         <div>
-          <h2 className="text-sm font-medium text-ink/60 mb-2">Reminder Categories</h2>
+          <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.duaReminders.categories}</h2>
           <div className={`bg-white rounded-2xl divide-y divide-sand-dark ${!prefs.enabled ? "opacity-50" : ""}`}>
             {categories.map((cat) => {
               const isEnabled = prefs.enabled_categories.includes(cat.code);
               const label =
-                prefs.preferred_language === "ar"
-                  ? cat.label_ar ?? cat.label_en
-                  : prefs.preferred_language === "ur"
-                  ? cat.label_ur ?? cat.label_en
-                  : cat.label_en;
+                language === "ar" ? cat.label_ar ?? cat.label_en : language === "ur" ? cat.label_ur ?? cat.label_en : cat.label_en;
               return (
                 <div key={cat.code} className="p-4">
                   <div className="flex items-center justify-between">
                     <span>{label}</span>
-                    <ToggleSwitch
-                      checked={isEnabled}
-                      onChange={() => toggleCategory(cat.code)}
-                    />
+                    <ToggleSwitch checked={isEnabled} onChange={() => toggleCategory(cat.code)} />
                   </div>
                   {isEnabled && (
                     <input
@@ -161,8 +153,8 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: (v: b
       }`}
     >
       <span
-        className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform ${
-          checked ? "translate-x-5" : ""
+        className={`absolute top-1 ltr:left-1 rtl:right-1 w-5 h-5 rounded-full bg-white transition-transform ${
+          checked ? "ltr:translate-x-5 rtl:-translate-x-5" : ""
         }`}
       />
     </button>

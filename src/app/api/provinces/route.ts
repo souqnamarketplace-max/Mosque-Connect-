@@ -5,7 +5,7 @@ export async function GET() {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("provinces")
-    .select("id, code, name")
+    .select("id, code, name, name_ar, name_ur")
     .order("sort_order", { ascending: true });
 
   if (error) {
