@@ -1,14 +1,23 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Settings } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getOnboardingState } from "@/lib/onboardingState";
 import { getServerDict } from "@/lib/i18n/getServerDict";
+import { gregorianToHijri, formatHijriDate } from "@/lib/hijriDate";
 import PrayerCountdownWidget from "@/components/PrayerCountdownWidget";
 import EmergencyBanner from "@/components/EmergencyBanner";
 import DailyDuaCard from "@/components/DailyDuaCard";
+import DailyContentCard from "@/components/DailyContentCard";
 import QuickActionsGrid from "@/components/QuickActionsGrid";
+import LatestAnnouncementCard from "@/components/LatestAnnouncementCard";
+import UpcomingEventCard from "@/components/UpcomingEventCard";
 import DeviceInitializer from "@/components/DeviceInitializer";
+import FooterNav from "@/components/FooterNav";
+
+function getGreetingKey(hour: number): "greetingMorning" | "greetingAfternoon" | "greetingEvening" {
+  if (hour < 12) return "greetingMorning";
+  if (hour < 17) return "greetingAfternoon";
+  return "greetingEvening";
+}
 
 export default async function HomePage() {
   const { mosqueId } = await getOnboardingState();
@@ -29,29 +38,24 @@ export default async function HomePage() {
     redirect("/onboarding/language");
   }
 
-  const todayLabel = new Date().toLocaleDateString(language === "ar" ? "ar" : language === "ur" ? "ur" : "en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
+  const locale = language === "ar" ? "ar" : language === "ur" ? "ur" : "en-US";
+  const now = new Date();
+  const todayLabel = now.toLocaleDateString(locale, { weekday: "long", month: "long", day: "numeric" });
+  const hijri = gregorianToHijri(now);
+  const hijriLabel = formatHijriDate(hijri, language);
+  const greeting = dict.home[getGreetingKey(now.getHours())];
 
   return (
-    <div className="min-h-screen bg-sand">
+    <div className="min-h-screen bg-sand pb-24">
       <DeviceInitializer />
-      <header className="px-5 pt-6 pb-2 text-center relative">
-        <Link
-          href="/settings"
-          aria-label={dict.common.settings}
-          className="absolute end-5 top-6 text-ink/40 hover:text-ink/70"
-        >
-          <Settings className="w-5 h-5" />
-        </Link>
-        <p className="text-xs uppercase tracking-widest text-sage">{todayLabel}</p>
+      <header className="px-5 pt-6 pb-2 text-center">
+        <p className="text-sm text-ink/60">{greeting}</p>
         <h1 className="font-display text-2xl mt-1">{mosque.name}</h1>
-        {mosque.address && <p className="text-xs text-ink/50 mt-0.5">{mosque.address}</p>}
+        <p className="text-xs uppercase tracking-widest text-sage mt-1">{todayLabel}</p>
+        <p className="text-xs text-ink/40 mt-0.5">{hijriLabel}</p>
       </header>
 
-      <main className="max-w-md mx-auto px-5 pb-16">
+      <main className="max-w-md mx-auto px-5">
         <EmergencyBanner mosqueId={mosque.id} />
 
         <section className="py-4">
@@ -62,10 +66,28 @@ export default async function HomePage() {
           <QuickActionsGrid />
         </section>
 
-        <section className="mb-6">
+        <section className="mb-4">
           <DailyDuaCard />
         </section>
+
+        <section className="mb-4">
+          <DailyContentCard categoryCode="daily_hadith" title={dict.home.dailyHadith} language={language} />
+        </section>
+
+        <section className="mb-6">
+          <DailyContentCard categoryCode="daily_quran_verse" title={dict.home.quranVerse} language={language} />
+        </section>
+
+        <section className="mb-3">
+          <LatestAnnouncementCard />
+        </section>
+
+        <section className="mb-6">
+          <UpcomingEventCard />
+        </section>
       </main>
+
+      <FooterNav />
     </div>
   );
 }

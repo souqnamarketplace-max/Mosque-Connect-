@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createServiceRoleClient } from "@/lib/supabase/serviceRole";
-import { getAuthorizedDeviceId } from "@/lib/deviceAuth";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getAuthenticatedUserId } from "@/lib/userAuth";
 
 const PRAYER_CODES = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const;
 
@@ -29,26 +29,28 @@ function sanitizeOverrides(overrides: Record<string, unknown> | undefined) {
 }
 
 export async function GET() {
-  const deviceId = await getAuthorizedDeviceId();
-  if (!deviceId) {
-    return NextResponse.json({ error: "No device session. Call /api/device/init first." }, { status: 401 });
+  const userId = await getAuthenticatedUserId();
+  if (!userId) {
+    return NextResponse.json({ error: "No session. Call /api/auth/ensure-session first." }, { status: 401 });
   }
 
-  const supabase = createServiceRoleClient();
+  // Uses the regular RLS-respecting client now — the athan_prefs_own_row
+  // policy (user_id = auth.uid()) does the ownership enforcement, so this
+  // route no longer needs the service-role client or manual checks.
+  const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("athan_preferences")
     .select("*")
-    .eq("device_id", deviceId)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (error) {
     return NextResponse.json({ error: "Failed to load preferences" }, { status: 500 });
   }
 
-  // Default shape if this device has never saved preferences yet.
   return NextResponse.json(
     data ?? {
-      device_id: deviceId,
+      user_id: userId,
       mosque_id: null,
       athan_enabled: true,
       athan_voice_id: null,
@@ -60,9 +62,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
-  const deviceId = await getAuthorizedDeviceId();
-  if (!deviceId) {
-    return NextResponse.json({ error: "No device session. Call /api/device/init first." }, { status: 401 });
+  const userId = await getAuthenticatedUserId();
+  if (!userId) {
+    return NextResponse.json({ error: "No session. Call /api/auth/ensure-session first." }, { status: 401 });
   }
 
   const body = await request.json();
@@ -74,13 +76,13 @@ export async function PATCH(request: NextRequest) {
   const update = {
     ...parsed.data,
     per_prayer_overrides: sanitizeOverrides(parsed.data.per_prayer_overrides),
-    device_id: deviceId, // always forced to the cookie's device_id — client cannot override this
+    user_id: userId, // always forced server-side from the session — client cannot override this
   };
 
-  const supabase = createServiceRoleClient();
+  const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("athan_preferences")
-    .upsert(update, { onConflict: "device_id" })
+    .upsert(update, { onConflict: "user_id" })
     .select()
     .single();
 

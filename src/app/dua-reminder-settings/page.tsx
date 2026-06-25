@@ -36,7 +36,7 @@ export default function DuaReminderSettingsPage() {
 
   useEffect(() => {
     async function load() {
-      await fetch("/api/device/init", { method: "POST" });
+      await fetch("/api/auth/ensure-session", { method: "POST" });
       const [catsRes, prefsRes] = await Promise.all([
         fetch("/api/dua-categories"),
         fetch("/api/dua-reminder-preferences"),

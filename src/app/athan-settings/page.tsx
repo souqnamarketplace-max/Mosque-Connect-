@@ -45,7 +45,7 @@ export default function AthanSettingsPage() {
 
   useEffect(() => {
     async function load() {
-      await fetch("/api/device/init", { method: "POST" });
+      await fetch("/api/auth/ensure-session", { method: "POST" });
       const [voicesRes, prefsRes] = await Promise.all([
         fetch("/api/athan-voices"),
         fetch("/api/athan-preferences"),

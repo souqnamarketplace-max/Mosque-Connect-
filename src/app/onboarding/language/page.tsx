@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OnboardingProgress from "@/components/OnboardingProgress";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
@@ -16,6 +16,14 @@ export default function LanguageSelectionPage() {
   const { dict, setLanguage } = useI18n();
   const [selected, setSelected] = useState<"en" | "ar" | "ur" | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Onboarding is the earliest point a person interacts with the app, so
+  // this is where the anonymous session should be created — not deferred
+  // to the Home Screen — so that mosque selection a few steps later can be
+  // tied to a real user_id immediately rather than only a cookie.
+  useEffect(() => {
+    fetch("/api/auth/ensure-session", { method: "POST" }).catch(() => {});
+  }, []);
 
   const handleContinue = async () => {
     if (!selected) return;

@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from "react";
 
-/** Ensures /api/device/init has been called once per browser so the
- * httpOnly device_id cookie exists before any preference reads/writes. */
+/** Ensures an authenticated (anonymous) Supabase session exists before any
+ * preference reads/writes that depend on auth.uid(). Despite the filename
+ * (kept for now to avoid churning every import), this no longer manages a
+ * device_id cookie — it triggers Supabase Anonymous Auth via the server
+ * route, which sets a real session cookie. */
 export function useDeviceInit() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    fetch("/api/device/init", { method: "POST" })
+    fetch("/api/auth/ensure-session", { method: "POST" })
       .then(() => setReady(true))
       .catch(() => setReady(true)); // fail open for read-only public content
   }, []);

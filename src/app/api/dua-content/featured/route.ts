@@ -38,17 +38,21 @@ export async function GET(request: NextRequest) {
 
     if (!category) return null;
 
-    const { data: content } = await supabase
+    const { data: contentRows } = await supabase
       .from("dua_content")
       .select("*")
       .eq("category_id", category.id)
       .eq("is_active", true)
       .or(`active_from.is.null,active_from.lte.${todayStr}`)
       .or(`active_to.is.null,active_to.gte.${todayStr}`)
-      .limit(1)
-      .maybeSingle();
+      .order("created_at", { ascending: true });
 
-    if (!content) return null;
+    if (!contentRows || contentRows.length === 0) return null;
+
+    const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
+    const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / 86400000);
+    const content = contentRows[dayOfYear % contentRows.length];
+
     return { category, content };
   }
 

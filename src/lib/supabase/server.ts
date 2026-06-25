@@ -1,10 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-// Anon, RLS-respecting server client — use for all PUBLIC reads (mosques, prayer
-// times, announcements, events, dua content, etc). Never use this for the three
-// device-scoped tables (athan_preferences, dua_reminder_preferences,
-// dua_reminder_log) — use createServiceRoleClient + manual device_id checks instead.
+// Anon, RLS-respecting, session-aware server client. Used for all public
+// reads (mosques, prayer times, announcements, events, dua content, etc.)
+// AND for user-owned data (athan_preferences, dua_reminder_preferences,
+// dua_reminder_log, family accounts, mosque admin actions) — RLS policies
+// keyed on auth.uid() (including anonymous-auth users) do the ownership
+// enforcement, so this client is safe for both cases. The service-role
+// client (serviceRole.ts) is reserved for contexts with no user session at
+// all, e.g. the nightly prayer-times cron job.
 export async function createServerSupabaseClient() {
   const cookieStore = await cookies();
   return createServerClient(

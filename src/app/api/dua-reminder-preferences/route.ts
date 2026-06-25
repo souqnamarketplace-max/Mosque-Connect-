@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createServiceRoleClient } from "@/lib/supabase/serviceRole";
-import { getAuthorizedDeviceId } from "@/lib/deviceAuth";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getAuthenticatedUserId } from "@/lib/userAuth";
 
 const patchSchema = z.object({
   enabled: z.boolean().optional(),
@@ -11,16 +11,16 @@ const patchSchema = z.object({
 });
 
 export async function GET() {
-  const deviceId = await getAuthorizedDeviceId();
-  if (!deviceId) {
-    return NextResponse.json({ error: "No device session. Call /api/device/init first." }, { status: 401 });
+  const userId = await getAuthenticatedUserId();
+  if (!userId) {
+    return NextResponse.json({ error: "No session. Call /api/auth/ensure-session first." }, { status: 401 });
   }
 
-  const supabase = createServiceRoleClient();
+  const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("dua_reminder_preferences")
     .select("*")
-    .eq("device_id", deviceId)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (error) {
@@ -29,7 +29,7 @@ export async function GET() {
 
   return NextResponse.json(
     data ?? {
-      device_id: deviceId,
+      user_id: userId,
       enabled: true,
       enabled_categories: [],
       preferred_language: "en",
@@ -39,9 +39,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
-  const deviceId = await getAuthorizedDeviceId();
-  if (!deviceId) {
-    return NextResponse.json({ error: "No device session. Call /api/device/init first." }, { status: 401 });
+  const userId = await getAuthenticatedUserId();
+  if (!userId) {
+    return NextResponse.json({ error: "No session. Call /api/auth/ensure-session first." }, { status: 401 });
   }
 
   const body = await request.json();
@@ -50,9 +50,8 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload", details: parsed.error.flatten() }, { status: 400 });
   }
 
-  const supabase = createServiceRoleClient();
+  const supabase = await createServerSupabaseClient();
 
-  // Validate enabled_categories against real, active categories before storing.
   let cleanCategories = parsed.data.enabled_categories;
   if (cleanCategories) {
     const { data: validCats } = await supabase
@@ -63,7 +62,6 @@ export async function PATCH(request: NextRequest) {
     cleanCategories = cleanCategories.filter((c) => validCodes.has(c));
   }
 
-  // reminder_times entries are only kept for categories that are actually enabled.
   let cleanTimes = parsed.data.reminder_times;
   if (cleanTimes && cleanCategories) {
     const allowed = new Set(cleanCategories);
@@ -74,12 +72,12 @@ export async function PATCH(request: NextRequest) {
     ...parsed.data,
     enabled_categories: cleanCategories,
     reminder_times: cleanTimes,
-    device_id: deviceId,
+    user_id: userId,
   };
 
   const { data, error } = await supabase
     .from("dua_reminder_preferences")
-    .upsert(update, { onConflict: "device_id" })
+    .upsert(update, { onConflict: "user_id" })
     .select()
     .single();
 
