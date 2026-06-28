@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
   const { data: mosque, error: mosqueError } = await supabase
     .from("mosques")
-    .select("id, timezone, is_active")
+    .select("id, timezone, is_active, latitude, longitude")
     .eq("id", parsed.data.mosque_id)
     .single();
 
@@ -60,9 +60,26 @@ export async function GET(request: NextRequest) {
     .eq("iqama_date", dateStr)
     .single();
 
+  // Tomorrow's Fajr is needed (not today's) to correctly compute the last
+  // third of tonight: the Islamic "night" runs from today's Maghrib to
+  // TOMORROW's Fajr, not today's — today's Fajr already happened before
+  // today's Maghrib even occurs.
+  const tomorrow = new Date(`${dateStr}T12:00:00Z`);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().substring(0, 10);
+
+  const { data: tomorrowPrayerRow } = await supabase
+    .from("prayer_times")
+    .select("fajr")
+    .eq("mosque_id", mosque.id)
+    .eq("prayer_date", tomorrowStr)
+    .single();
+
   return NextResponse.json({
     date: dateStr,
     timezone: mosque.timezone,
+    latitude: mosque.latitude,
+    longitude: mosque.longitude,
     adhan: {
       fajr: prayerRow.fajr,
       sunrise: prayerRow.sunrise,
@@ -71,6 +88,7 @@ export async function GET(request: NextRequest) {
       maghrib: prayerRow.maghrib,
       isha: prayerRow.isha,
     },
+    tomorrowFajr: tomorrowPrayerRow?.fajr ?? null,
     iqama: iqamaRow
       ? {
           fajr: iqamaRow.fajr,

@@ -1,6 +1,8 @@
 export interface PrayerTimesPayload {
   date: string;
   timezone: string;
+  latitude?: number | null;
+  longitude?: number | null;
   adhan: {
     fajr: string;
     sunrise: string;
@@ -9,6 +11,7 @@ export interface PrayerTimesPayload {
     maghrib: string;
     isha: string;
   };
+  tomorrowFajr?: string | null;
   iqama: {
     fajr: string;
     dhuhr: string;
@@ -89,4 +92,31 @@ export function formatCountdown(msRemaining: number): string {
   const s = totalSeconds % 60;
   const pad = (n: number) => String(n).padStart(2, "0");
   return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+
+/**
+ * The Islamic "night" runs from today's Maghrib to tomorrow's Fajr (true
+ * dawn) — verified against multiple independent reference sources, all
+ * consistent: total duration ÷ 3, last third begins at
+ * tomorrowFajr - (duration / 3). Returns null if tomorrow's Fajr isn't
+ * available (e.g. right at the edge of the seeded prayer-times window).
+ */
+export function calculateLastThirdOfNight(
+  dateStr: string,
+  maghribTime: string,
+  tomorrowFajrTime: string | null | undefined
+): Date | null {
+  if (!tomorrowFajrTime) return null;
+
+  const maghribAt = new Date(`${dateStr}T${maghribTime}Z`);
+  const tomorrow = new Date(`${dateStr}T12:00:00Z`);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().substring(0, 10);
+  const fajrAt = new Date(`${tomorrowStr}T${tomorrowFajrTime}Z`);
+
+  const nightDurationMs = fajrAt.getTime() - maghribAt.getTime();
+  if (nightDurationMs <= 0) return null;
+
+  const oneThirdMs = nightDurationMs / 3;
+  return new Date(fajrAt.getTime() - oneThirdMs);
 }

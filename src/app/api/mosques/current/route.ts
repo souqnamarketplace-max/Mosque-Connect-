@@ -12,7 +12,7 @@ export async function GET() {
   const { data, error } = await supabase
     .from("mosques")
     .select(
-      "id, name, logo_url, description, address, phone, email, website, office_hours, latitude, longitude, donation_link"
+      "id, name, logo_url, cover_image_url, description, address, phone, email, website, office_hours, latitude, longitude, donation_link"
     )
     .eq("id", mosqueId)
     .eq("is_active", true)

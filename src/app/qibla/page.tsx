@@ -4,36 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Compass as CompassIcon, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n/I18nProvider";
-
-const KAABA_LAT = 21.4225;
-const KAABA_LNG = 39.8262;
-
-function toRad(deg: number) {
-  return (deg * Math.PI) / 180;
-}
-function toDeg(rad: number) {
-  return (rad * 180) / Math.PI;
-}
-
-function calculateQiblaBearing(lat: number, lng: number): number {
-  const φ1 = toRad(lat);
-  const φ2 = toRad(KAABA_LAT);
-  const Δλ = toRad(KAABA_LNG - lng);
-
-  const y = Math.sin(Δλ) * Math.cos(φ2);
-  const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-  const θ = Math.atan2(y, x);
-  return (toDeg(θ) + 360) % 360;
-}
-
-function calculateDistanceKm(lat: number, lng: number): number {
-  const R = 6371;
-  const dLat = toRad(KAABA_LAT - lat);
-  const dLng = toRad(KAABA_LNG - lng);
-  const a =
-    Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat)) * Math.cos(toRad(KAABA_LAT)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
+import { calculateQiblaBearing, calculateQiblaDistanceKm } from "@/lib/qibla";
 
 type PageState = "loading" | "needs_location" | "needs_orientation_permission" | "ready" | "unsupported";
 
@@ -53,7 +24,7 @@ export default function QiblaPage() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const bearing = calculateQiblaBearing(pos.coords.latitude, pos.coords.longitude);
-        const distance = calculateDistanceKm(pos.coords.latitude, pos.coords.longitude);
+        const distance = calculateQiblaDistanceKm(pos.coords.latitude, pos.coords.longitude);
         setQiblaBearing(bearing);
         setDistanceKm(Math.round(distance));
 
