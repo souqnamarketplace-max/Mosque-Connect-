@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getOnboardingState } from "@/lib/onboardingState";
 import { getServerDict } from "@/lib/i18n/getServerDict";
 import { gregorianToHijri, formatHijriDate } from "@/lib/hijriDate";
+import HomeHeroCard from "@/components/HomeHeroCard";
 import PrayerCountdownWidget from "@/components/PrayerCountdownWidget";
 import EmergencyBanner from "@/components/EmergencyBanner";
 import DailyDuaCard from "@/components/DailyDuaCard";
@@ -30,7 +31,7 @@ export default async function HomePage() {
   const supabase = await createServerSupabaseClient();
   const { data: mosque } = await supabase
     .from("mosques")
-    .select("id, name, address")
+    .select("id, name, address, cover_image_url")
     .eq("id", mosqueId)
     .single();
 
@@ -46,19 +47,24 @@ export default async function HomePage() {
   const greeting = dict.home[getGreetingKey(now.getHours())];
 
   return (
-    <div className="min-h-screen bg-sand pb-24">
+    <div className="min-h-screen bg-sand pb-28">
       <DeviceInitializer />
-      <header className="px-5 pt-6 pb-2 text-center">
-        <p className="text-sm text-ink/60">{greeting}</p>
-        <h1 className="font-display text-2xl mt-1">{mosque.name}</h1>
-        <p className="text-xs uppercase tracking-widest text-sage mt-1">{todayLabel}</p>
-        <p className="text-xs text-ink/60 mt-0.5">{hijriLabel}</p>
-      </header>
 
-      <main className="max-w-md mx-auto px-5">
-        <EmergencyBanner mosqueId={mosque.id} />
+      <main className="max-w-md mx-auto px-4 pt-4">
+        <HomeHeroCard
+          mosqueId={mosque.id}
+          mosqueName={mosque.name}
+          coverImageUrl={mosque.cover_image_url}
+          greeting={greeting}
+          dateLabel={todayLabel}
+          hijriLabel={hijriLabel}
+        />
 
-        <section className="py-4">
+        <section className="mt-4">
+          <EmergencyBanner mosqueId={mosque.id} />
+        </section>
+
+        <section className="py-5 flex justify-center">
           <PrayerCountdownWidget mosqueId={mosque.id} />
         </section>
 

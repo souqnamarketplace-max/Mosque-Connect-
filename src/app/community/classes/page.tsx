@@ -99,7 +99,7 @@ export default function ClassesPage() {
               const spotsLeft = cls.capacity != null ? cls.capacity - cls.registeredCount : null;
 
               return (
-                <div key={cls.id} className="bg-white rounded-2xl p-4">
+                <div key={cls.id} className="bg-card rounded-2xl p-4">
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <h2 className="font-display text-lg">{cls.title}</h2>
                     <span className="text-xs bg-night-teal/10 text-night-teal px-2 py-0.5 rounded-full flex-shrink-0">
@@ -142,7 +142,7 @@ export default function ClassesPage() {
               aria-label={dict.classes.studentName}
                         value={form.studentName}
                         onChange={(e) => setForm((f) => ({ ...f, studentName: e.target.value }))}
-                        className="w-full bg-white rounded-lg px-3 py-2 text-sm"
+                        className="w-full bg-card rounded-lg px-3 py-2 text-sm"
                       />
                       <input
                         type="number"
@@ -150,7 +150,7 @@ export default function ClassesPage() {
               aria-label={dict.classes.studentAge}
                         value={form.studentAge}
                         onChange={(e) => setForm((f) => ({ ...f, studentAge: e.target.value }))}
-                        className="w-full bg-white rounded-lg px-3 py-2 text-sm"
+                        className="w-full bg-card rounded-lg px-3 py-2 text-sm"
                       />
                       <input
                         type="tel"
@@ -158,7 +158,7 @@ export default function ClassesPage() {
               aria-label={dict.classes.contactPhone}
                         value={form.contactPhone}
                         onChange={(e) => setForm((f) => ({ ...f, contactPhone: e.target.value }))}
-                        className="w-full bg-white rounded-lg px-3 py-2 text-sm"
+                        className="w-full bg-card rounded-lg px-3 py-2 text-sm"
                       />
                       {error && <p className="text-urgent text-xs" role="alert">{error}</p>}
                       <button

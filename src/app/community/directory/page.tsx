@@ -111,7 +111,7 @@ export default function BusinessDirectoryPage() {
         )}
 
         {showForm && (
-          <div className="bg-white rounded-2xl p-4 mb-5 space-y-3">
+          <div className="bg-card rounded-2xl p-4 mb-5 space-y-3">
             <input
               type="text"
               placeholder={dict.directory.businessName}
@@ -178,7 +178,7 @@ export default function BusinessDirectoryPage() {
           <button
             onClick={() => setActiveCategory(null)}
             className={`flex-shrink-0 px-3.5 py-2 rounded-full text-sm font-medium ${
-              activeCategory === null ? "bg-night-teal text-sand" : "bg-white text-ink/70"
+              activeCategory === null ? "bg-night-teal text-sand" : "bg-card text-ink/70"
             }`}
           >
             {dict.directory.filterAll}
@@ -188,7 +188,7 @@ export default function BusinessDirectoryPage() {
               key={c}
               onClick={() => setActiveCategory(c)}
               className={`flex-shrink-0 px-3.5 py-2 rounded-full text-sm font-medium ${
-                activeCategory === c ? "bg-night-teal text-sand" : "bg-white text-ink/70"
+                activeCategory === c ? "bg-night-teal text-sand" : "bg-card text-ink/70"
               }`}
             >
               {categoryLabels[c]}
@@ -206,7 +206,7 @@ export default function BusinessDirectoryPage() {
         ) : (
           <div className="space-y-2">
             {businesses.map((biz) => (
-              <div key={biz.id} className="bg-white rounded-xl p-4">
+              <div key={biz.id} className="bg-card rounded-xl p-4">
                 <p className="font-medium">{biz.business_name}</p>
                 <p className="text-xs text-night-teal">{categoryLabels[biz.category]}</p>
                 {biz.description && <p className="text-sm text-ink/70 mt-1">{biz.description}</p>}

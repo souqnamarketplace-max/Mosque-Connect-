@@ -36,7 +36,7 @@ export default function CommunityPage() {
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-3 bg-white rounded-xl p-4 hover:bg-sand-dark/20 transition-colors"
+              className="flex items-center gap-3 bg-card rounded-xl p-4 hover:bg-sand-dark/20 transition-colors"
             >
               <Icon className="w-5 h-5 text-night-teal flex-shrink-0" />
               <span className="flex-1 font-medium">{label}</span>
@@ -44,7 +44,7 @@ export default function CommunityPage() {
           ) : (
             <div
               key={href}
-              className="flex items-center gap-3 bg-white/60 rounded-xl p-4 opacity-60"
+              className="flex items-center gap-3 bg-card/60 rounded-xl p-4 opacity-60"
               aria-disabled="true"
             >
               <Icon className="w-5 h-5 text-ink/60 flex-shrink-0" />

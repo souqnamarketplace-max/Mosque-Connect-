@@ -88,14 +88,14 @@ export default function AthanSettingsPage() {
       </header>
 
       <main className="max-w-md mx-auto px-5 pb-16 space-y-6">
-        <div className="flex items-center justify-between bg-white rounded-2xl p-4">
+        <div className="flex items-center justify-between bg-card rounded-2xl p-4">
           <span className="font-medium">{dict.athan.enable}</span>
           <ToggleSwitch checked={prefs.athan_enabled} onChange={(v) => save({ athan_enabled: v })} />
         </div>
 
         <div>
           <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.athan.voice}</h2>
-          <div className="bg-white rounded-2xl divide-y divide-sand-dark">
+          <div className="bg-card rounded-2xl divide-y divide-sand-dark">
             {voices.map((voice) => (
               <label key={voice.id} className="flex items-center justify-between p-4 cursor-pointer">
                 <span>{voice.name}</span>
@@ -111,7 +111,7 @@ export default function AthanSettingsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-4">
+        <div className="bg-card rounded-2xl p-4">
           <div className="flex justify-between text-sm mb-2">
             <span className="font-medium">{dict.athan.volume}</span>
             <span className="text-ink/60">{Math.round(prefs.volume * 100)}%</span>
@@ -137,7 +137,7 @@ export default function AthanSettingsPage() {
                 className={`py-3 rounded-xl text-sm font-medium transition-colors ${
                   prefs.alert_mode === mode.value
                     ? "bg-night-teal text-sand"
-                    : "bg-white text-ink/70 hover:bg-sand-dark"
+                    : "bg-card text-ink/70 hover:bg-sand-dark"
                 }`}
               >
                 {mode.label}
@@ -148,7 +148,7 @@ export default function AthanSettingsPage() {
 
         <div>
           <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.athan.perPrayer}</h2>
-          <div className="bg-white rounded-2xl divide-y divide-sand-dark">
+          <div className="bg-card rounded-2xl divide-y divide-sand-dark">
             {PRAYERS.map((p) => {
               const enabled = prefs.per_prayer_overrides[p.code]?.enabled ?? true;
               return (
@@ -174,7 +174,7 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: (v: b
       className={`w-12 h-7 rounded-full transition-colors relative ${checked ? "bg-night-teal" : "bg-sand-dark"}`}
     >
       <span
-        className={`absolute top-1 ltr:left-1 rtl:right-1 w-5 h-5 rounded-full bg-white transition-transform ${
+        className={`absolute top-1 ltr:left-1 rtl:right-1 w-5 h-5 rounded-full bg-card transition-transform ${
           checked ? "ltr:translate-x-5 rtl:-translate-x-5" : ""
         }`}
       />

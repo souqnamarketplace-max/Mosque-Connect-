@@ -108,7 +108,7 @@ export default function IqamaTimesAdminPage() {
             type="date"
             value={editDate}
             onChange={(e) => setEditDate(e.target.value)}
-            className="w-full bg-white rounded-xl px-4 py-3 mb-4 border border-sand-dark"
+            className="w-full bg-card rounded-xl px-4 py-3 mb-4 border border-sand-dark"
           />
 
           {isFriday && (
@@ -117,7 +117,7 @@ export default function IqamaTimesAdminPage() {
             </div>
           )}
 
-          <div className="bg-white rounded-2xl divide-y divide-sand-dark">
+          <div className="bg-card rounded-2xl divide-y divide-sand-dark">
             {(["fajr", "dhuhr", "asr", "maghrib", "isha"] as const).map((prayer) => (
               <div key={prayer} className="flex items-center justify-between p-4">
                 <span className="capitalize">{prayer === "dhuhr" && isFriday ? "Jumu'ah Iqama" : prayer}</span>

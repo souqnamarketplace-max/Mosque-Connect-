@@ -80,7 +80,7 @@ function MosqueSelectionContent() {
         {loading ? (
           <div className="space-y-3">
             {Array.from({ length: 3 }, (_, i) => (
-              <div key={i} className="h-24 rounded-2xl bg-white/60 animate-pulse" />
+              <div key={i} className="h-24 rounded-2xl bg-card/60 animate-pulse" />
             ))}
           </div>
         ) : mosques.length === 0 ? (
@@ -92,7 +92,7 @@ function MosqueSelectionContent() {
                 key={mosque.id}
                 onClick={() => handleSelect(mosque.id)}
                 disabled={selecting !== null}
-                className="w-full text-left p-4 rounded-2xl bg-white border border-sand-dark hover:border-night-teal transition-colors disabled:opacity-60"
+                className="w-full text-left p-4 rounded-2xl bg-card border border-sand-dark hover:border-night-teal transition-colors disabled:opacity-60"
               >
                 <div className="flex gap-3">
                   <div className="w-12 h-12 rounded-xl bg-sand-dark flex items-center justify-center flex-shrink-0 overflow-hidden">

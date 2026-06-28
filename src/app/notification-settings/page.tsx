@@ -71,7 +71,7 @@ export default function NotificationSettingsPage() {
 
       <main className="max-w-md mx-auto px-5 space-y-6">
         {/* Push enable */}
-        <div className="bg-white rounded-2xl p-4">
+        <div className="bg-card rounded-2xl p-4">
           <div className="flex items-start gap-3 mb-3">
             <Bell className="w-5 h-5 text-night-teal flex-shrink-0 mt-0.5" />
             <div>
@@ -104,7 +104,7 @@ export default function NotificationSettingsPage() {
         <div>
           <h2 className="text-sm font-medium text-ink/60 mb-1">{dict.notificationSettings.quietHours}</h2>
           <p className="text-xs text-ink/60 mb-2">{dict.notificationSettings.quietHoursDesc}</p>
-          <div className="bg-white rounded-2xl p-4 grid grid-cols-2 gap-3">
+          <div className="bg-card rounded-2xl p-4 grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-ink/60 mb-1">{dict.notificationSettings.from}</label>
               <input
@@ -129,7 +129,7 @@ export default function NotificationSettingsPage() {
         {/* Categories */}
         <div>
           <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.notificationSettings.categories}</h2>
-          <div className="bg-white rounded-2xl divide-y divide-sand-dark">
+          <div className="bg-card rounded-2xl divide-y divide-sand-dark">
             <div className="flex items-center justify-between p-4">
               <span>{dict.notificationSettings.newAnnouncements}</span>
               <ToggleSwitch
@@ -160,7 +160,7 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: (v: b
       }`}
     >
       <span
-        className={`absolute top-1 ltr:left-1 rtl:right-1 w-5 h-5 rounded-full bg-white transition-transform ${
+        className={`absolute top-1 ltr:left-1 rtl:right-1 w-5 h-5 rounded-full bg-card transition-transform ${
           checked ? "ltr:translate-x-5 rtl:-translate-x-5" : ""
         }`}
       />

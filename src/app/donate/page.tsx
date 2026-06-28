@@ -66,7 +66,7 @@ export default function DonatePage() {
                     key={c.id}
                     onClick={() => setSelectedCampaignId(c.id)}
                     className={`flex-shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition-colors ${
-                      selectedCampaignId === c.id ? "bg-night-teal text-sand" : "bg-white text-ink/70"
+                      selectedCampaignId === c.id ? "bg-night-teal text-sand" : "bg-card text-ink/70"
                     }`}
                   >
                     {c.title}
@@ -114,7 +114,7 @@ export default function DonatePage() {
                   key={freq}
                   onClick={() => setFrequency(freq)}
                   className={`py-3.5 rounded-xl text-base font-medium transition-colors ${
-                    frequency === freq ? "bg-night-teal text-sand" : "bg-white text-ink/70"
+                    frequency === freq ? "bg-night-teal text-sand" : "bg-card text-ink/70"
                   }`}
                 >
                   {freq === "one_time" ? dict.donate.oneTime : dict.donate.monthly}
@@ -135,7 +135,7 @@ export default function DonatePage() {
                   className={`py-5 rounded-2xl text-xl font-display transition-colors ${
                     amount === preset && !customAmount
                       ? "bg-gold text-ink"
-                      : "bg-white text-ink border border-sand-dark"
+                      : "bg-card text-ink border border-sand-dark"
                   }`}
                 >
                   ${preset}
@@ -152,7 +152,7 @@ export default function DonatePage() {
                 setCustomAmount(e.target.value);
                 setAmount(null);
               }}
-              className="w-full bg-white rounded-xl px-4 py-4 text-lg border border-sand-dark mb-6"
+              className="w-full bg-card rounded-xl px-4 py-4 text-lg border border-sand-dark mb-6"
             />
 
             {/* Honest placeholder — payment integration not yet wired up. */}

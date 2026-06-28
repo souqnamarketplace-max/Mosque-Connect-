@@ -96,7 +96,7 @@ export default function VolunteerPage() {
         ) : (
           <div className="space-y-4">
             {opportunities.map((opp) => (
-              <div key={opp.id} className="bg-white rounded-2xl p-4">
+              <div key={opp.id} className="bg-card rounded-2xl p-4">
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <h2 className="font-display text-lg">{opp.title}</h2>
                   <span className="text-xs bg-night-teal/10 text-night-teal px-2 py-0.5 rounded-full flex-shrink-0">
@@ -144,7 +144,7 @@ export default function VolunteerPage() {
               aria-label={dict.volunteer.yourName}
                                 value={form.volunteerName}
                                 onChange={(e) => setForm((f) => ({ ...f, volunteerName: e.target.value }))}
-                                className="w-full bg-white rounded-lg px-3 py-2 text-sm"
+                                className="w-full bg-card rounded-lg px-3 py-2 text-sm"
                               />
                               <input
                                 type="tel"
@@ -152,7 +152,7 @@ export default function VolunteerPage() {
               aria-label={dict.volunteer.contactPhone}
                                 value={form.contactPhone}
                                 onChange={(e) => setForm((f) => ({ ...f, contactPhone: e.target.value }))}
-                                className="w-full bg-white rounded-lg px-3 py-2 text-sm"
+                                className="w-full bg-card rounded-lg px-3 py-2 text-sm"
                               />
                               {error && <p className="text-urgent text-xs" role="alert">{error}</p>}
                               <button

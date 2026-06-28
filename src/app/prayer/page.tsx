@@ -55,7 +55,7 @@ export default function PrayerPage() {
         </section>
 
         <h2 className="text-base font-medium text-ink/60 mb-3">{dict.prayerPage.fullSchedule}</h2>
-        <div className="bg-white rounded-2xl divide-y divide-sand-dark">
+        <div className="bg-card rounded-2xl divide-y divide-sand-dark">
           {prayers.map((p) => (
             <div key={p.code} className="flex items-center justify-between p-4">
               <span className="font-display text-lg">{p.label}</span>

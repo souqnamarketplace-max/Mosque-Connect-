@@ -85,7 +85,7 @@ export default function DirectoryAdminPage() {
               setPage(1);
             }}
             className={`px-3 py-2 rounded-full text-sm font-medium capitalize ${
-              statusFilter === s ? "bg-night-teal text-sand" : "bg-white text-ink/70 border border-sand-dark"
+              statusFilter === s ? "bg-night-teal text-sand" : "bg-card text-ink/70 border border-sand-dark"
             }`}
           >
             {s}
@@ -104,7 +104,7 @@ export default function DirectoryAdminPage() {
         <>
           <div className="space-y-2">
             {submissions.map((sub) => (
-              <div key={sub.id} className="bg-white rounded-xl p-4">
+              <div key={sub.id} className="bg-card rounded-xl p-4">
                 <p className="font-medium">{sub.business_name}</p>
                 <p className="text-xs text-night-teal">{sub.category.replace(/_/g, " ")}</p>
                 {sub.description && <p className="text-sm text-ink/70 mt-1">{sub.description}</p>}

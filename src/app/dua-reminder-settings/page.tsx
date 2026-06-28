@@ -87,7 +87,7 @@ export default function DuaReminderSettingsPage() {
       </header>
 
       <main className="max-w-md mx-auto px-5 pb-16 space-y-6">
-        <div className="flex items-center justify-between bg-white rounded-2xl p-4">
+        <div className="flex items-center justify-between bg-card rounded-2xl p-4">
           <span className="font-medium">{dict.duaReminders.enable}</span>
           <ToggleSwitch checked={prefs.enabled} onChange={(v) => save({ enabled: v })} />
         </div>
@@ -102,7 +102,7 @@ export default function DuaReminderSettingsPage() {
                 className={`py-3 rounded-xl text-sm font-medium transition-colors ${
                   prefs.preferred_language === lang.code
                     ? "bg-night-teal text-sand"
-                    : "bg-white text-ink/70 hover:bg-sand-dark"
+                    : "bg-card text-ink/70 hover:bg-sand-dark"
                 }`}
               >
                 {lang.label}
@@ -113,7 +113,7 @@ export default function DuaReminderSettingsPage() {
 
         <div>
           <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.duaReminders.categories}</h2>
-          <div className={`bg-white rounded-2xl divide-y divide-sand-dark ${!prefs.enabled ? "opacity-50" : ""}`}>
+          <div className={`bg-card rounded-2xl divide-y divide-sand-dark ${!prefs.enabled ? "opacity-50" : ""}`}>
             {categories.map((cat) => {
               const isEnabled = prefs.enabled_categories.includes(cat.code);
               const label =
@@ -153,7 +153,7 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: (v: b
       }`}
     >
       <span
-        className={`absolute top-1 ltr:left-1 rtl:right-1 w-5 h-5 rounded-full bg-white transition-transform ${
+        className={`absolute top-1 ltr:left-1 rtl:right-1 w-5 h-5 rounded-full bg-card transition-transform ${
           checked ? "ltr:translate-x-5 rtl:-translate-x-5" : ""
         }`}
       />

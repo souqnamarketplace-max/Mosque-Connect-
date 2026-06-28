@@ -105,7 +105,7 @@ export default function AnalyticsAdminPage() {
 
 function StatCard({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: number }) {
   return (
-    <div className="bg-white rounded-2xl p-4">
+    <div className="bg-card rounded-2xl p-4">
       <Icon className="w-4 h-4 text-night-teal mb-2" />
       <p className="font-display text-2xl">{value.toLocaleString()}</p>
       <p className="text-xs text-ink/60">{label}</p>
@@ -115,7 +115,7 @@ function StatCard({ icon: Icon, label, value }: { icon: typeof Users; label: str
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl p-4">
+    <div className="bg-card rounded-2xl p-4">
       <p className="text-sm font-medium mb-2">{title}</p>
       {children}
     </div>

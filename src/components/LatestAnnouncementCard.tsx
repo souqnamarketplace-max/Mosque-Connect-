@@ -24,11 +24,11 @@ export default function LatestAnnouncementCard() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="h-20 rounded-2xl bg-white/60 animate-pulse" />;
+  if (loading) return <div className="h-20 rounded-2xl bg-card/60 animate-pulse" />;
   if (!item) return null;
 
   return (
-    <Link href="/announcements" className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-sand-dark">
+    <Link href="/announcements" className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-sand-dark">
       <div className="w-9 h-9 rounded-full bg-night-teal/10 flex items-center justify-center flex-shrink-0">
         <Megaphone className="w-4 h-4 text-night-teal" />
       </div>

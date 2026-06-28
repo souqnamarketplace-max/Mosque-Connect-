@@ -1,21 +1,73 @@
 @import "tailwindcss";
 
 @theme {
-  --color-night-teal: #15433d;
-  --color-night-teal-light: #1f5c53;
-  --color-sand: #f7f2e9;
-  --color-sand-dark: #ece3d2;
-  --color-gold: #c9952c;
-  --color-gold-light: #e0b658;
-  --color-urgent: #c1502e;
-  --color-ink: #2b2622;
-  --color-sage: #5d6d65; /* WCAG fix 2026-06-26: was #8fa89c (2.28:1 on sand, fails AA);
-    darkened to 4.90:1, same hue family, passes AA for normal text */
+  /* Premium redesign palette (2026-06-28) — adopted from the design brief
+   * almost exactly as specified (hex values are the brief's own), since the
+   * brief pins down a real visual direction rather than leaving it open.
+   * Token NAMES are kept as night-teal/sand/gold/etc. so existing component
+   * code doesn't need a mass rename — only the underlying hex shifts. */
+  --color-night-teal: #114d44;        /* brief: Deep Emerald (primary) */
+  --color-night-teal-light: #1e6a5d;  /* brief: Forest Green (accent) */
+  --color-sand: #faf7f1;              /* brief: Warm Ivory (background) */
+  --color-sand-dark: #ece6da;         /* brief: Dividers */
+  --color-gold: #d7a441;              /* brief: Soft Gold (secondary) */
+  --color-gold-light: #e6c073;
+  --color-urgent: #e45a5a;            /* brief: Error */
+  --color-success: #3fa46a;
+  --color-warning: #f4b740;
+  --color-ink: #222222;               /* brief: Text Primary */
+  --color-ink-secondary: #757575;     /* brief: Text Secondary — only at 14px+, see note below */
+  --color-sage: #5d6d65;              /* kept from WCAG fix, used as a muted-teal accent (still 4.90:1 on sand) */
+  --color-card: #ffffff;              /* card surface — light mode: brief's "Pure White" */
 
-  --font-display: Georgia, "Times New Roman", serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
-  --font-arabic: "Noto Naskh Arabic", "Geeza Pro", "Segoe UI", system-ui, sans-serif;
+  /* Typography per the brief's pairing intent (a premium geometric sans for
+   * display, a humanist sans for body, Cairo-family for Arabic). Google
+   * Fonts (Inter/Plus Jakarta Sans/Cairo) aren't reachable from this build
+   * environment's network allowlist, so these stacks lead with the closest
+   * native equivalents already on iOS/Android/desktop — SF Pro Display and
+   * Segoe UI both share Inter's geometric, premium character — falling
+   * back gracefully. If Google Fonts becomes reachable in your own build
+   * environment, swap the leading family for next/font/google loaders of
+   * Inter / Plus_Jakarta_Sans / Cairo with zero other changes needed, since
+   * every component already references --font-display/--font-sans/--font-arabic. */
+  --font-display: -apple-system, "SF Pro Display", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  --font-sans: -apple-system, "SF Pro Text", "Segoe UI Variable", "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-arabic: "Geeza Pro", "Dubai", "Segoe UI", "Noto Naskh Arabic", system-ui, sans-serif;
   --font-urdu: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Segoe UI", system-ui, sans-serif;
+
+  /* Brief's signature shape language: "large rounded corners (24px), soft
+   * shadows, no harsh borders." Tokenized so every card/sheet/button shares
+   * the exact same radius and shadow recipe rather than improvising per file. */
+  --radius-card: 1.5rem;   /* 24px */
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px rgba(17, 77, 68, 0.04), 0 8px 24px -4px rgba(17, 77, 68, 0.10);
+  --shadow-card-hover: 0 2px 4px rgba(17, 77, 68, 0.06), 0 16px 32px -8px rgba(17, 77, 68, 0.16);
+  --shadow-float: 0 4px 16px rgba(17, 77, 68, 0.12), 0 1px 4px rgba(17, 77, 68, 0.08);
+
+  /* Type scale per the brief's hierarchy: page title 36 / section 24 /
+   * card title 20 / body 16 / caption 13 / countdown 48+. Exposed as
+   * Tailwind text-* utilities via --text-* so e.g. text-page-title just
+   * works everywhere rather than every screen hand-rolling text-[36px]. */
+  --text-caption: 0.8125rem;     /* 13px */
+  --text-body: 1rem;             /* 16px */
+  --text-card-title: 1.25rem;    /* 20px */
+  --text-section-title: 1.5rem;  /* 24px */
+  --text-page-title: 2.25rem;    /* 36px */
+  --text-countdown: 3rem;        /* 48px */
+}
+
+/* Dark mode — per the brief, designed deliberately rather than inverted.
+ * "Dark Emerald, Warm Charcoal, Soft Ivory text" — applied via the
+ * `.dark` class (toggled by the existing theme setting in Settings/Profile,
+ * which already writes light/dark/system to a cookie read on the server). */
+.dark {
+  --color-sand: #1a2420;          /* Warm Charcoal */
+  --color-sand-dark: #243530;
+  --color-ink: #f3efe6;           /* Soft Ivory text */
+  --color-ink-secondary: #b8bdb9;
+  --color-night-teal: #1e6a5d;    /* swap primary/accent roles so emerald still pops on dark */
+  --color-night-teal-light: #2d8472;
+  --color-card: #223530;          /* card surface — a lifted charcoal, not pure black, per "maintain elegance" */
 }
 
 [dir="rtl"] body {

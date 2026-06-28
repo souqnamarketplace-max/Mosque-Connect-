@@ -22,7 +22,7 @@ export default function PaginationControls({ page, totalPages, totalCount, onPag
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
           aria-label="Previous page"
-          className="p-2 rounded-full bg-white border border-sand-dark disabled:opacity-40 disabled:cursor-not-allowed hover:bg-sand-dark/30"
+          className="p-2 rounded-full bg-card border border-sand-dark disabled:opacity-40 disabled:cursor-not-allowed hover:bg-sand-dark/30"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -30,7 +30,7 @@ export default function PaginationControls({ page, totalPages, totalCount, onPag
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
           aria-label="Next page"
-          className="p-2 rounded-full bg-white border border-sand-dark disabled:opacity-40 disabled:cursor-not-allowed hover:bg-sand-dark/30"
+          className="p-2 rounded-full bg-card border border-sand-dark disabled:opacity-40 disabled:cursor-not-allowed hover:bg-sand-dark/30"
         >
           <ChevronRight className="w-4 h-4" />
         </button>

@@ -114,7 +114,7 @@ export default function FamilyAccountPage() {
           <div className="flex flex-col items-center gap-4 py-10 text-center">
             <Users className="w-10 h-10 text-ink/60" />
             <p className="text-ink/60">{dict.family.noFamilyYet}</p>
-            <div className="w-full bg-white rounded-2xl p-4 space-y-3 text-left">
+            <div className="w-full bg-card rounded-2xl p-4 space-y-3 text-left">
               <input
                 type="text"
                 placeholder={dict.family.yourName}
@@ -146,7 +146,7 @@ export default function FamilyAccountPage() {
             {family.name && <h2 className="font-display text-xl mb-4 text-center">{family.name}</h2>}
 
             <h3 className="text-sm font-medium text-ink/60 mb-2">{dict.family.members}</h3>
-            <div className="bg-white rounded-2xl divide-y divide-sand-dark mb-5">
+            <div className="bg-card rounded-2xl divide-y divide-sand-dark mb-5">
               {members.map((member) => (
                 <div key={member.id} className="flex items-center gap-3 p-4">
                   <div className="flex-1">
@@ -170,7 +170,7 @@ export default function FamilyAccountPage() {
             </div>
 
             {isOwner && (
-              <div className="bg-white rounded-2xl p-4">
+              <div className="bg-card rounded-2xl p-4">
                 {inviteUrl ? (
                   <>
                     <p className="text-sm font-medium mb-2">{dict.family.inviteLinkCreated}</p>

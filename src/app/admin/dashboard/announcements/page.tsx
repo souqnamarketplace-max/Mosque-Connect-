@@ -134,7 +134,7 @@ export default function AnnouncementsAdminPage() {
             onClick={() => setShowFilters((s) => !s)}
             aria-label={showFilters ? "Hide filters" : "Show filters"}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium ${
-              categoryFilter ? "bg-night-teal text-sand" : "bg-white text-ink/70 border border-sand-dark"
+              categoryFilter ? "bg-night-teal text-sand" : "bg-card text-ink/70 border border-sand-dark"
             }`}
           >
             <Filter className="w-4 h-4" />
@@ -150,7 +150,7 @@ export default function AnnouncementsAdminPage() {
       </div>
 
       {showFilters && (
-        <div className="bg-white rounded-2xl p-3 mb-4">
+        <div className="bg-card rounded-2xl p-3 mb-4">
           <select
             value={categoryFilter}
             onChange={(e) => {
@@ -171,7 +171,7 @@ export default function AnnouncementsAdminPage() {
       )}
 
       {showForm && (
-        <div className="bg-white rounded-2xl p-4 mb-5 space-y-3">
+        <div className="bg-card rounded-2xl p-4 mb-5 space-y-3">
           <select
             value={form.category}
             onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as typeof form.category }))}
@@ -208,13 +208,13 @@ export default function AnnouncementsAdminPage() {
               aria-label="Name of the deceased"
                 value={form.deceasedName}
                 onChange={(e) => setForm((f) => ({ ...f, deceasedName: e.target.value }))}
-                className="w-full bg-white rounded-lg px-3 py-2"
+                className="w-full bg-card rounded-lg px-3 py-2"
               />
               <input
                 type="datetime-local"
                 value={form.burialTime}
                 onChange={(e) => setForm((f) => ({ ...f, burialTime: e.target.value }))}
-                className="w-full bg-white rounded-lg px-3 py-2"
+                className="w-full bg-card rounded-lg px-3 py-2"
               />
               <input
                 type="text"
@@ -222,7 +222,7 @@ export default function AnnouncementsAdminPage() {
               aria-label="Burial location"
                 value={form.burialLocation}
                 onChange={(e) => setForm((f) => ({ ...f, burialLocation: e.target.value }))}
-                className="w-full bg-white rounded-lg px-3 py-2"
+                className="w-full bg-card rounded-lg px-3 py-2"
               />
             </div>
           )}
@@ -235,13 +235,13 @@ export default function AnnouncementsAdminPage() {
               aria-label="Names of the couple"
                 value={form.coupleNames}
                 onChange={(e) => setForm((f) => ({ ...f, coupleNames: e.target.value }))}
-                className="w-full bg-white rounded-lg px-3 py-2"
+                className="w-full bg-card rounded-lg px-3 py-2"
               />
               <input
                 type="datetime-local"
                 value={form.ceremonyTime}
                 onChange={(e) => setForm((f) => ({ ...f, ceremonyTime: e.target.value }))}
-                className="w-full bg-white rounded-lg px-3 py-2"
+                className="w-full bg-card rounded-lg px-3 py-2"
               />
               <input
                 type="text"
@@ -249,7 +249,7 @@ export default function AnnouncementsAdminPage() {
               aria-label="Ceremony location"
                 value={form.ceremonyLocation}
                 onChange={(e) => setForm((f) => ({ ...f, ceremonyLocation: e.target.value }))}
-                className="w-full bg-white rounded-lg px-3 py-2"
+                className="w-full bg-card rounded-lg px-3 py-2"
               />
             </div>
           )}
@@ -282,7 +282,7 @@ export default function AnnouncementsAdminPage() {
         <>
           <div className="space-y-2">
             {items.map((item) => (
-              <div key={item.id} className="bg-white rounded-xl p-4 flex items-start gap-3">
+              <div key={item.id} className="bg-card rounded-xl p-4 flex items-start gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     {item.is_pinned && <Pin className="w-3.5 h-3.5 text-gold" />}

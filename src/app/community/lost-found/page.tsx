@@ -117,7 +117,7 @@ export default function LostFoundPage() {
 
       <main className="max-w-md mx-auto px-5">
         {showForm && (
-          <div className="bg-white rounded-2xl p-4 mb-5 space-y-3">
+          <div className="bg-card rounded-2xl p-4 mb-5 space-y-3">
             <div className="grid grid-cols-2 gap-2">
               {(["lost", "found"] as const).map((t) => (
                 <button
@@ -216,7 +216,7 @@ export default function LostFoundPage() {
         ) : (
           <div className="space-y-2">
             {posts.map((post) => (
-              <div key={post.id} className="bg-white rounded-xl p-4">
+              <div key={post.id} className="bg-card rounded-xl p-4">
                 <div className="flex items-start gap-2">
                   <span
                     className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${

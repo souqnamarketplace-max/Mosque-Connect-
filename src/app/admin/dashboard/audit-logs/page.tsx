@@ -106,7 +106,7 @@ export default function AuditLogsAdminPage() {
           onClick={() => setShowFilters((s) => !s)}
           aria-label={showFilters ? "Hide filters" : "Show filters"}
           className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium ${
-            hasActiveFilters ? "bg-night-teal text-sand" : "bg-white text-ink/70 border border-sand-dark"
+            hasActiveFilters ? "bg-night-teal text-sand" : "bg-card text-ink/70 border border-sand-dark"
           }`}
         >
           {showFilters ? <X className="w-4 h-4" /> : <Filter className="w-4 h-4" />}
@@ -115,7 +115,7 @@ export default function AuditLogsAdminPage() {
       </div>
 
       {showFilters && (
-        <div className="bg-white rounded-2xl p-4 mb-4 space-y-3">
+        <div className="bg-card rounded-2xl p-4 mb-4 space-y-3">
           <select
             value={actionFilter}
             onChange={(e) => handleFilterChange(setActionFilter)(e.target.value)}
@@ -164,7 +164,7 @@ export default function AuditLogsAdminPage() {
         <>
           <div className="space-y-1.5">
             {logs.map((log) => (
-              <div key={log.id} className="bg-white rounded-xl p-3 text-sm">
+              <div key={log.id} className="bg-card rounded-xl p-3 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{ACTION_LABELS[log.action] ?? log.action}</span>
                   <span className="text-xs text-ink/60">

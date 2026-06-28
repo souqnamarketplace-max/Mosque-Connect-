@@ -127,7 +127,7 @@ export default function EventsAdminPage() {
             onClick={() => setShowFilters((s) => !s)}
             aria-label={showFilters ? "Hide filters" : "Show filters"}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium ${
-              categoryFilter ? "bg-night-teal text-sand" : "bg-white text-ink/70 border border-sand-dark"
+              categoryFilter ? "bg-night-teal text-sand" : "bg-card text-ink/70 border border-sand-dark"
             }`}
           >
             <Filter className="w-4 h-4" />
@@ -143,7 +143,7 @@ export default function EventsAdminPage() {
       </div>
 
       {showFilters && (
-        <div className="bg-white rounded-2xl p-3 mb-4">
+        <div className="bg-card rounded-2xl p-3 mb-4">
           <select
             value={categoryFilter}
             onChange={(e) => {
@@ -164,7 +164,7 @@ export default function EventsAdminPage() {
       )}
 
       {showForm && (
-        <div className="bg-white rounded-2xl p-4 mb-5 space-y-3">
+        <div className="bg-card rounded-2xl p-4 mb-5 space-y-3">
           <input
             type="text"
             placeholder="Event title"
@@ -255,7 +255,7 @@ export default function EventsAdminPage() {
         <>
           <div className="space-y-2">
             {items.map((item) => (
-              <div key={item.id} className="bg-white rounded-xl p-4 flex items-start gap-3">
+              <div key={item.id} className="bg-card rounded-xl p-4 flex items-start gap-3">
                 <CalendarDays className="w-4 h-4 text-night-teal flex-shrink-0 mt-1" />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium">{item.title}</p>

@@ -87,7 +87,7 @@ export default function MosqueProfileAdminPage() {
       {loading ? (
         <p className="text-center text-ink/60 py-8">Loading…</p>
       ) : (
-        <div className="bg-white rounded-2xl p-4 space-y-3">
+        <div className="bg-card rounded-2xl p-4 space-y-3">
           <Field label="Description">
             <textarea
               value={form.description}

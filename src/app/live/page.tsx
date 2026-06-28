@@ -67,7 +67,7 @@ export default function LiveStreamPage() {
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
               <span className="flex items-center gap-1.5 bg-urgent text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-card animate-pulse" />
                 {dict.liveStream.live}
               </span>
               {data.live.title && <span className="text-sm text-ink/70">{data.live.title}</span>}
@@ -112,7 +112,7 @@ export default function LiveStreamPage() {
                   href={rec.recording_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 bg-white rounded-xl p-4"
+                  className="flex items-center gap-3 bg-card rounded-xl p-4"
                 >
                   <div className="w-10 h-10 rounded-full bg-night-teal/10 flex items-center justify-center flex-shrink-0">
                     <Play className="w-4 h-4 text-night-teal" />

@@ -151,7 +151,7 @@ export default function VolunteerAdminPage() {
             onClick={() => setShowFilters((s) => !s)}
             aria-label={showFilters ? "Hide filters" : "Show filters"}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium ${
-              categoryFilter ? "bg-night-teal text-sand" : "bg-white text-ink/70 border border-sand-dark"
+              categoryFilter ? "bg-night-teal text-sand" : "bg-card text-ink/70 border border-sand-dark"
             }`}
           >
             <Filter className="w-4 h-4" />
@@ -167,7 +167,7 @@ export default function VolunteerAdminPage() {
       </div>
 
       {showFilters && (
-        <div className="bg-white rounded-2xl p-3 mb-4">
+        <div className="bg-card rounded-2xl p-3 mb-4">
           <select
             value={categoryFilter}
             onChange={(e) => {
@@ -188,7 +188,7 @@ export default function VolunteerAdminPage() {
       )}
 
       {showForm && (
-        <div className="bg-white rounded-2xl p-4 mb-5 space-y-3">
+        <div className="bg-card rounded-2xl p-4 mb-5 space-y-3">
           <input
             type="text"
             placeholder="Opportunity title"
@@ -245,7 +245,7 @@ export default function VolunteerAdminPage() {
         <>
           <div className="space-y-3">
             {opportunities.map((opp) => (
-              <div key={opp.id} className="bg-white rounded-xl p-4">
+              <div key={opp.id} className="bg-card rounded-xl p-4">
                 <div className="flex items-start justify-between">
                 <p className="font-medium">{opp.title}</p>
                 <button onClick={() => handleDelete(opp.id)} className="text-ink/60 hover:text-urgent p-2">
@@ -273,20 +273,20 @@ export default function VolunteerAdminPage() {
                     type="date"
                     value={shiftForm.shiftDate}
                     onChange={(e) => setShiftForm((f) => ({ ...f, shiftDate: e.target.value }))}
-                    className="w-full bg-white rounded-lg px-3 py-2 text-sm"
+                    className="w-full bg-card rounded-lg px-3 py-2 text-sm"
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       type="time"
                       value={shiftForm.startTime}
                       onChange={(e) => setShiftForm((f) => ({ ...f, startTime: e.target.value }))}
-                      className="bg-white rounded-lg px-3 py-2 text-sm"
+                      className="bg-card rounded-lg px-3 py-2 text-sm"
                     />
                     <input
                       type="time"
                       value={shiftForm.endTime}
                       onChange={(e) => setShiftForm((f) => ({ ...f, endTime: e.target.value }))}
-                      className="bg-white rounded-lg px-3 py-2 text-sm"
+                      className="bg-card rounded-lg px-3 py-2 text-sm"
                     />
                   </div>
                   <input
@@ -295,7 +295,7 @@ export default function VolunteerAdminPage() {
               aria-label="Capacity (optional)"
                     value={shiftForm.capacity}
                     onChange={(e) => setShiftForm((f) => ({ ...f, capacity: e.target.value }))}
-                    className="w-full bg-white rounded-lg px-3 py-2 text-sm"
+                    className="w-full bg-card rounded-lg px-3 py-2 text-sm"
                   />
                   <button
                     onClick={() => handleAddShift(opp.id)}

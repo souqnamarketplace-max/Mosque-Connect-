@@ -84,7 +84,7 @@ function JoinFamilyContent() {
               aria-label={dict.family.yourName}
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-white border border-sand-dark focus:outline-none focus:ring-2 focus:ring-night-teal"
+            className="w-full px-4 py-3 rounded-xl bg-card border border-sand-dark focus:outline-none focus:ring-2 focus:ring-night-teal"
           />
 
           {error && <p className="text-urgent text-sm bg-urgent/10 rounded-lg px-3 py-2" role="alert">{error}</p>}

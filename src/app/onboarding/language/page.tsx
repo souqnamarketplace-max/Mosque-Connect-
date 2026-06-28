@@ -53,7 +53,7 @@ export default function LanguageSelectionPage() {
               className={`w-full text-left p-4 rounded-2xl border-2 transition-colors ${
                 selected === lang.code
                   ? "border-night-teal bg-night-teal/5"
-                  : "border-sand-dark bg-white hover:border-sage"
+                  : "border-sand-dark bg-card hover:border-sage"
               }`}
             >
               <span className="font-display text-lg block">{lang.nativeLabel}</span>

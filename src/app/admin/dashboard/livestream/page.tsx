@@ -94,7 +94,7 @@ export default function LiveStreamAdminPage() {
         <div className="bg-night-teal text-sand rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-2">
             <span className="flex items-center gap-1.5 bg-urgent text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-card animate-pulse" />
               LIVE
             </span>
             <span className="text-sm">{liveStream.title || liveStream.source}</span>
@@ -120,7 +120,7 @@ export default function LiveStreamAdminPage() {
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl p-4 space-y-3">
+        <div className="bg-card rounded-2xl p-4 space-y-3">
           <p className="text-sm text-ink/60 mb-1">Start a new live stream:</p>
           <input
             type="text"

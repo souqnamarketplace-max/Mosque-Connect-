@@ -67,7 +67,7 @@ export default function AnnouncementsPage() {
         {loading ? (
           <div className="space-y-3">
             {Array.from({ length: 4 }, (_, i) => (
-              <div key={i} className="h-24 rounded-2xl bg-white/60 animate-pulse" />
+              <div key={i} className="h-24 rounded-2xl bg-card/60 animate-pulse" />
             ))}
           </div>
         ) : announcements.length === 0 ? (
@@ -75,7 +75,7 @@ export default function AnnouncementsPage() {
         ) : (
           <div className="space-y-3">
             {announcements.map((a) => (
-              <div key={a.id} className="bg-white rounded-2xl p-4">
+              <div key={a.id} className="bg-card rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-2">
                   {a.is_pinned && <Pin className="w-3.5 h-3.5 text-gold flex-shrink-0" />}
                   <span

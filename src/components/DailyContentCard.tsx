@@ -30,12 +30,12 @@ export default function DailyContentCard({
   }, [categoryCode, language]);
 
   if (loading) {
-    return <div className="h-24 rounded-2xl bg-white/60 animate-pulse" />;
+    return <div className="h-24 rounded-2xl bg-card/60 animate-pulse" />;
   }
   if (!content) return null;
 
   return (
-    <div className="bg-white rounded-2xl p-4 border border-sand-dark">
+    <div className="bg-card rounded-2xl p-4 border border-sand-dark">
       <p className="text-xs uppercase tracking-wide text-sage mb-2">{title}</p>
       <p className={`leading-relaxed ${language === "ar" ? "text-right" : ""}`} dir={language === "ar" ? "rtl" : "ltr"}>
         {content.text}

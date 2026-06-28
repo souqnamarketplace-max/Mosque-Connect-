@@ -74,7 +74,7 @@ export default function SettingsPage() {
         {/* Location & Mosque */}
         <div>
           <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.settings.locationMosque}</h2>
-          <div className="bg-white rounded-2xl divide-y divide-sand-dark">
+          <div className="bg-card rounded-2xl divide-y divide-sand-dark">
             <SettingsRow
               icon={MapPin}
               label={dict.settings.mosque}
@@ -99,7 +99,7 @@ export default function SettingsPage() {
         {/* Language */}
         <div>
           <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.settings.languageSection}</h2>
-          <div className="bg-white rounded-2xl">
+          <div className="bg-card rounded-2xl">
             <SettingsRow
               icon={Globe}
               label={dict.settings.appLanguage}
@@ -112,7 +112,7 @@ export default function SettingsPage() {
         {/* Notifications */}
         <div>
           <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.settings.notifications}</h2>
-          <div className="bg-white rounded-2xl divide-y divide-sand-dark">
+          <div className="bg-card rounded-2xl divide-y divide-sand-dark">
             <SettingsRow icon={Bell} label={dict.settings.athanSettings} href="/athan-settings" />
             <SettingsRow icon={Bell} label={dict.settings.duaReminderSettings} href="/dua-reminder-settings" />
             <SettingsRow icon={Bell} label={dict.notificationSettings.title} href="/notification-settings" />
@@ -122,7 +122,7 @@ export default function SettingsPage() {
         {/* Family */}
         <div>
           <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.family.title}</h2>
-          <div className="bg-white rounded-2xl">
+          <div className="bg-card rounded-2xl">
             <SettingsRow icon={Users} label={dict.family.title} href="/family" />
           </div>
         </div>
@@ -136,7 +136,7 @@ export default function SettingsPage() {
                 key={value}
                 onClick={() => saveTheme(value)}
                 className={`flex flex-col items-center gap-1.5 py-3 rounded-xl text-sm transition-colors ${
-                  theme === value ? "bg-night-teal text-sand" : "bg-white text-ink/70 hover:bg-sand-dark"
+                  theme === value ? "bg-night-teal text-sand" : "bg-card text-ink/70 hover:bg-sand-dark"
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -149,7 +149,7 @@ export default function SettingsPage() {
         {/* Admin */}
         <div>
           <h2 className="text-sm font-medium text-ink/60 mb-2">{dict.settings.mosqueAdmin}</h2>
-          <div className="bg-white rounded-2xl">
+          <div className="bg-card rounded-2xl">
             <SettingsRow icon={ShieldCheck} label={dict.settings.adminLogin} href="/admin/login" />
           </div>
         </div>

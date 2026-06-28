@@ -51,7 +51,7 @@ export default function ProvinceSelectionPage() {
         {loading ? (
           <div className="space-y-2">
             {Array.from({ length: 5 }, (_, i) => (
-              <div key={i} className="h-14 rounded-xl bg-white/60 animate-pulse" />
+              <div key={i} className="h-14 rounded-xl bg-card/60 animate-pulse" />
             ))}
           </div>
         ) : (
@@ -60,7 +60,7 @@ export default function ProvinceSelectionPage() {
               <button
                 key={province.id}
                 onClick={() => handleSelect(province.id)}
-                className="w-full flex items-center justify-between p-4 rounded-xl bg-white border border-sand-dark hover:border-night-teal transition-colors"
+                className="w-full flex items-center justify-between p-4 rounded-xl bg-card border border-sand-dark hover:border-night-teal transition-colors"
               >
                 <span className="flex items-center gap-3">
                   <MapPin className="w-4 h-4 text-sage" />

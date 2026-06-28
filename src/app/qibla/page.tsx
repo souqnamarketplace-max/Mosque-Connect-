@@ -156,7 +156,7 @@ export default function QiblaPage() {
             <p className="text-center text-ink/60 mb-8">{dict.qibla.instructions}</p>
 
             <div className="relative w-72 h-72 mb-8">
-              <div className="absolute inset-0 rounded-full border-4 border-sand-dark bg-white" />
+              <div className="absolute inset-0 rounded-full border-4 border-sand-dark bg-card" />
               <span className="absolute top-3 left-1/2 -translate-x-1/2 text-sm font-medium text-ink/60">N</span>
               <span className="absolute bottom-3 left-1/2 -translate-x-1/2 text-sm font-medium text-ink/60">S</span>
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-ink/60">W</span>

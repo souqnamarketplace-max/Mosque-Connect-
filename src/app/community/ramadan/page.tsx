@@ -48,7 +48,7 @@ export default function RamadanSchedulePage() {
         {loading ? (
           <div className="space-y-2">
             {Array.from({ length: 5 }, (_, i) => (
-              <div key={i} className="h-16 rounded-xl bg-white/60 animate-pulse" />
+              <div key={i} className="h-16 rounded-xl bg-card/60 animate-pulse" />
             ))}
           </div>
         ) : days.length === 0 ? (
@@ -63,7 +63,7 @@ export default function RamadanSchedulePage() {
               return (
                 <div
                   key={day.id}
-                  className={`rounded-2xl p-4 ${isToday ? "bg-night-teal text-sand" : "bg-white"}`}
+                  className={`rounded-2xl p-4 ${isToday ? "bg-night-teal text-sand" : "bg-card"}`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className={`font-display text-lg ${isToday ? "text-sand" : ""}`}>

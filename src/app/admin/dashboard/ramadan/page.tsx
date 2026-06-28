@@ -79,7 +79,7 @@ export default function RamadanAdminPage() {
     >
       <h2 className="font-display text-lg mb-4">Ramadan Schedule</h2>
 
-      <div className="bg-white rounded-2xl p-4 mb-5 space-y-3">
+      <div className="bg-card rounded-2xl p-4 mb-5 space-y-3">
         <p className="text-sm text-ink/60">
           Auto-generate all 30 days from your mosque&apos;s prayer calculation settings. Suhoor End defaults to
           Fajr Adhan time and Iftar defaults to Maghrib Adhan time — adjust individual days below if your mosque
@@ -126,7 +126,7 @@ export default function RamadanAdminPage() {
       ) : days.length > 0 ? (
         <div className="space-y-1.5">
           {days.map((day) => (
-            <div key={day.id} className="bg-white rounded-xl p-3 flex items-center justify-between text-sm">
+            <div key={day.id} className="bg-card rounded-xl p-3 flex items-center justify-between text-sm">
               <span className="font-medium">Day {day.islamic_day}</span>
               <span className="text-ink/60">{day.gregorian_date}</span>
               <span className="tabular-nums">

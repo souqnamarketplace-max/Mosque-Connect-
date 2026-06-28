@@ -55,7 +55,7 @@ export default function AdminDashboardShell({
             {mosques.length > 1 && <ChevronDown className="w-4 h-4 flex-shrink-0" />}
           </button>
           {showPicker && mosques.length > 1 && (
-            <div className="absolute top-full mt-2 left-0 bg-white text-ink rounded-xl shadow-lg overflow-hidden z-10 min-w-52">
+            <div className="absolute top-full mt-2 left-0 bg-card text-ink rounded-xl shadow-lg overflow-hidden z-10 min-w-52">
               {mosques.map((m) => (
                 <button
                   key={m.id}
@@ -77,7 +77,7 @@ export default function AdminDashboardShell({
         </button>
       </header>
 
-      <nav className="bg-white border-b border-sand-dark overflow-x-auto sticky top-[60px] z-10">
+      <nav className="bg-card border-b border-sand-dark overflow-x-auto sticky top-[60px] z-10">
         <div className="flex gap-1 px-3 py-2 min-w-max">
           {tabs.map((tab) => (
             <Link

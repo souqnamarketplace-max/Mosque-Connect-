@@ -139,7 +139,7 @@ export default function PlatformAdminPage() {
         {lastAcceptUrl && (
           <div role="status" className="bg-night-teal/10 border border-night-teal/30 rounded-xl p-4 mb-5">
             <p className="text-sm font-medium mb-1">Invite created. Share this link:</p>
-            <p className="text-xs break-all bg-white rounded-lg p-2 mb-2">{lastAcceptUrl}</p>
+            <p className="text-xs break-all bg-card rounded-lg p-2 mb-2">{lastAcceptUrl}</p>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(lastAcceptUrl);
@@ -162,7 +162,7 @@ export default function PlatformAdminPage() {
               onClick={() => setShowFilters((s) => !s)}
               aria-label={showFilters ? "Hide filters" : "Show filters"}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium ${
-                statusFilter ? "bg-night-teal text-sand" : "bg-white text-ink/70 border border-sand-dark"
+                statusFilter ? "bg-night-teal text-sand" : "bg-card text-ink/70 border border-sand-dark"
               }`}
             >
               <Filter className="w-4 h-4" />
@@ -178,7 +178,7 @@ export default function PlatformAdminPage() {
         </div>
 
         {showFilters && (
-          <div className="bg-white rounded-2xl p-3 mb-4">
+          <div className="bg-card rounded-2xl p-3 mb-4">
             <select
               value={statusFilter}
               onChange={(e) => {
@@ -198,7 +198,7 @@ export default function PlatformAdminPage() {
         )}
 
         {showForm && (
-          <div className="bg-white rounded-2xl p-4 mb-5 space-y-3">
+          <div className="bg-card rounded-2xl p-4 mb-5 space-y-3">
             <input
               type="email"
               placeholder="admin@email.com"
@@ -250,7 +250,7 @@ export default function PlatformAdminPage() {
           <>
             <div className="space-y-2">
               {invites.map((invite) => (
-                <div key={invite.id} className="bg-white rounded-xl p-4 flex items-start gap-3">
+                <div key={invite.id} className="bg-card rounded-xl p-4 flex items-start gap-3">
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{invite.email}</p>
                     <p className="text-xs text-ink/60">

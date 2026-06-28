@@ -79,7 +79,7 @@ export default function MosqueProfilePage() {
         {mosque.description && (
           <div>
             <h3 className="text-base font-medium text-ink/60 mb-2">{dict.mosqueProfile.about}</h3>
-            <p className="text-lg leading-relaxed bg-white rounded-2xl p-4">{mosque.description}</p>
+            <p className="text-lg leading-relaxed bg-card rounded-2xl p-4">{mosque.description}</p>
           </div>
         )}
 
@@ -110,7 +110,7 @@ export default function MosqueProfilePage() {
         {/* Contact details */}
         <div>
           <h3 className="text-base font-medium text-ink/60 mb-2">{dict.mosqueProfile.contact}</h3>
-          <div className="bg-white rounded-2xl divide-y divide-sand-dark">
+          <div className="bg-card rounded-2xl divide-y divide-sand-dark">
             {mosque.address && (
               <InfoRow icon={MapPin} label={dict.mosqueProfile.address} value={mosque.address} />
             )}

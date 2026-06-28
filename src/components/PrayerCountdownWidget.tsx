@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { PrayerTimesPayload, getNextEvent, formatCountdown, PrayerCode } from "@/lib/prayerTime";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import { cachePrayerPayload, getCachedPrayerPayload, getMostRecentCachedPayload } from "@/lib/offline/prayerCache";
-import { WifiOff } from "lucide-react";
+import { WifiOff, Landmark } from "lucide-react";
 
 interface Props {
   mosqueId: string;
@@ -164,20 +164,18 @@ export default function PrayerCountdownWidget({ mosqueId }: Props) {
   return (
     <div className="flex flex-col items-center">
       {isOffline && (
-        <div className="flex items-center gap-1.5 text-xs text-ink/60 bg-sand-dark/40 px-3 py-1 rounded-full mb-2">
+        <div className="flex items-center gap-1.5 text-xs text-ink-secondary bg-sand-dark/40 px-3 py-1 rounded-full mb-3">
           <WifiOff className="w-3 h-3" />
           {staleSince ? `${dict.home.offlineShowingStale} ${staleSince}` : dict.home.offlineShowingToday}
         </div>
       )}
       <button
         onClick={() => setExpanded(true)}
-        className="relative w-64 h-64 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-full"
+        className="relative w-64 h-64 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-full bg-card shadow-card"
         aria-label="View full prayer schedule"
       >
         <svg width="256" height="256" viewBox="0 0 256 256" className="-rotate-90">
-          {/* Outer track */}
           <circle cx="128" cy="128" r={RADIUS_OUTER} fill="none" stroke="var(--color-sand-dark)" strokeWidth={STROKE} />
-          {/* Outer progress (Adhan countdown) */}
           <circle
             cx="128"
             cy="128"
@@ -191,36 +189,32 @@ export default function PrayerCountdownWidget({ mosqueId }: Props) {
             className="transition-[stroke-dashoffset] duration-1000 ease-linear"
           />
           {isIqamaDominant && (
-            <>
-              {/* Inner track */}
-              <circle cx="128" cy="128" r={RADIUS_INNER} fill="none" stroke="var(--color-sand-dark)" strokeWidth={STROKE * 0.7} />
-              {/* Inner progress (Iqama countdown) */}
-              <circle
-                cx="128"
-                cy="128"
-                r={RADIUS_INNER}
-                fill="none"
-                stroke="var(--color-sage)"
-                strokeWidth={STROKE * 0.7}
-                strokeLinecap="round"
-                strokeDasharray={CIRCUMFERENCE_INNER}
-                strokeDashoffset={innerDashoffset}
-                className="transition-[stroke-dashoffset] duration-1000 ease-linear"
-              />
-            </>
+            <circle
+              cx="128"
+              cy="128"
+              r={RADIUS_INNER}
+              fill="none"
+              stroke="var(--color-sage)"
+              strokeWidth={STROKE * 0.6}
+              strokeLinecap="round"
+              strokeDasharray={CIRCUMFERENCE_INNER}
+              strokeDashoffset={innerDashoffset}
+              opacity={0.6}
+              className="transition-[stroke-dashoffset] duration-1000 ease-linear"
+            />
           )}
         </svg>
 
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-display text-2xl text-ink">{nextEvent.label}</span>
-          <span
-            className="font-display text-4xl tabular-nums mt-1"
-            style={{ color: ringColor }}
-          >
+          <div className="w-11 h-11 rounded-full bg-night-teal/10 flex items-center justify-center mb-2">
+            <Landmark className="w-5 h-5 text-night-teal" />
+          </div>
+          <span className="text-xs text-ink-secondary uppercase tracking-wide">{dict.home.timeRemaining}</span>
+          <span className="font-display text-4xl font-bold tabular-nums mt-1" style={{ color: ringColor }}>
             {formatCountdown(msRemaining)}
           </span>
-          <span className="text-xs uppercase tracking-wide text-ink/60 mt-1">
-            {nextEvent.type === "adhan" ? dict.home.untilAdhan : dict.home.untilIqama}
+          <span className="text-sm text-ink mt-1">
+            {nextEvent.type === "adhan" ? dict.home.untilAdhan : dict.home.untilIqama} {nextEvent.label}
           </span>
         </div>
       </button>

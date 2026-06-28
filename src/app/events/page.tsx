@@ -53,7 +53,7 @@ export default function EventsPage() {
               key={t}
               onClick={() => setTab(t)}
               className={`py-3 rounded-xl text-base font-medium transition-colors ${
-                tab === t ? "bg-night-teal text-sand" : "bg-white text-ink/70"
+                tab === t ? "bg-night-teal text-sand" : "bg-card text-ink/70"
               }`}
             >
               {t === "upcoming" ? dict.events.upcoming : dict.events.past}
@@ -64,7 +64,7 @@ export default function EventsPage() {
         {loading ? (
           <div className="space-y-3">
             {Array.from({ length: 3 }, (_, i) => (
-              <div key={i} className="h-28 rounded-2xl bg-white/60 animate-pulse" />
+              <div key={i} className="h-28 rounded-2xl bg-card/60 animate-pulse" />
             ))}
           </div>
         ) : events.length === 0 ? (
@@ -72,7 +72,7 @@ export default function EventsPage() {
         ) : (
           <div className="space-y-4">
             {events.map((event) => (
-              <div key={event.id} className="bg-white rounded-2xl p-4">
+              <div key={event.id} className="bg-card rounded-2xl p-4">
                 <div className="flex gap-3">
                   <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-night-teal/10 flex flex-col items-center justify-center">
                     <span className="text-xs text-night-teal font-medium">

@@ -59,7 +59,7 @@ function CitySelectionContent() {
         {loading ? (
           <div className="space-y-2">
             {Array.from({ length: 4 }, (_, i) => (
-              <div key={i} className="h-14 rounded-xl bg-white/60 animate-pulse" />
+              <div key={i} className="h-14 rounded-xl bg-card/60 animate-pulse" />
             ))}
           </div>
         ) : cities.length === 0 ? (
@@ -70,7 +70,7 @@ function CitySelectionContent() {
               <button
                 key={city.id}
                 onClick={() => handleSelect(city.id)}
-                className="w-full flex items-center gap-3 p-4 rounded-xl bg-white border border-sand-dark hover:border-night-teal transition-colors"
+                className="w-full flex items-center gap-3 p-4 rounded-xl bg-card border border-sand-dark hover:border-night-teal transition-colors"
               >
                 <Building className="w-4 h-4 text-sage" />
                 {localizedName(city)}

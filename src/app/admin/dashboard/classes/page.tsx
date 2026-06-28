@@ -127,7 +127,7 @@ export default function ClassesAdminPage() {
             onClick={() => setShowFilters((s) => !s)}
             aria-label={showFilters ? "Hide filters" : "Show filters"}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium ${
-              ageGroupFilter ? "bg-night-teal text-sand" : "bg-white text-ink/70 border border-sand-dark"
+              ageGroupFilter ? "bg-night-teal text-sand" : "bg-card text-ink/70 border border-sand-dark"
             }`}
           >
             <Filter className="w-4 h-4" />
@@ -143,7 +143,7 @@ export default function ClassesAdminPage() {
       </div>
 
       {showFilters && (
-        <div className="bg-white rounded-2xl p-3 mb-4">
+        <div className="bg-card rounded-2xl p-3 mb-4">
           <select
             value={ageGroupFilter}
             onChange={(e) => {
@@ -163,7 +163,7 @@ export default function ClassesAdminPage() {
       )}
 
       {showForm && (
-        <div className="bg-white rounded-2xl p-4 mb-5 space-y-3">
+        <div className="bg-card rounded-2xl p-4 mb-5 space-y-3">
           <input
             type="text"
             placeholder="Class title"
@@ -241,7 +241,7 @@ export default function ClassesAdminPage() {
         <>
           <div className="space-y-2">
             {classes.map((cls) => (
-              <div key={cls.id} className="bg-white rounded-xl p-4">
+              <div key={cls.id} className="bg-card rounded-xl p-4">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="font-medium">{cls.title}</p>
