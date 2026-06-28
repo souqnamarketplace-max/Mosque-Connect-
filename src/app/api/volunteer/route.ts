@@ -1,15 +1,18 @@
 import { NextResponse } from "next/server";
 import { getOnboardingState } from "@/lib/onboardingState";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getServerDict } from "@/lib/i18n/getServerDict";
+import { resolveLocalizedFieldsForList } from "@/lib/localizedFields";
 
 export async function GET() {
   const { mosqueId } = await getOnboardingState();
   if (!mosqueId) return NextResponse.json([]);
+  const { language } = await getServerDict();
 
   const supabase = await createServerSupabaseClient();
   const { data: opportunities, error } = await supabase
     .from("volunteer_opportunities")
-    .select("id, title, description, category, coordinator_name")
+    .select("id, title, title_ar, title_ur, description, description_ar, description_ur, category, coordinator_name")
     .eq("mosque_id", mosqueId)
     .eq("is_active", true)
     .order("created_at", { ascending: false });
@@ -17,7 +20,9 @@ export async function GET() {
   if (error) return NextResponse.json({ error: "Failed to load opportunities" }, { status: 500 });
   if (!opportunities || opportunities.length === 0) return NextResponse.json([]);
 
-  const oppIds = opportunities.map((o) => o.id);
+  const localizedOpportunities = resolveLocalizedFieldsForList(opportunities, ["title", "description"], language);
+
+  const oppIds = localizedOpportunities.map((o) => o.id);
   const { data: shifts } = await supabase
     .from("volunteer_shifts")
     .select("id, opportunity_id, shift_date, start_time, end_time, capacity")
@@ -41,7 +46,7 @@ export async function GET() {
 
   const enrichedShifts = (shifts ?? []).map((s) => ({ ...s, signedUpCount: countsByShift[s.id] ?? 0 }));
 
-  const result = opportunities.map((opp) => ({
+  const result = localizedOpportunities.map((opp) => ({
     ...opp,
     shifts: enrichedShifts.filter((s) => s.opportunity_id === opp.id),
   }));

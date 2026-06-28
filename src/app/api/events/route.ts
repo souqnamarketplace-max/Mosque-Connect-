@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOnboardingState } from "@/lib/onboardingState";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getServerDict } from "@/lib/i18n/getServerDict";
+import { resolveLocalizedFieldsForList } from "@/lib/localizedFields";
 
 export async function GET(request: NextRequest) {
   const { mosqueId } = await getOnboardingState();
@@ -9,13 +11,16 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const upcoming = searchParams.get("upcoming") === "true";
   const limit = Number(searchParams.get("limit") ?? "50");
+  const { language } = await getServerDict();
 
   const supabase = await createServerSupabaseClient();
   const todayStr = new Date().toISOString().substring(0, 10);
 
   let query = supabase
     .from("events")
-    .select("id, title, description, category, event_date, start_time, end_time, location, speaker, registration_url, image_url")
+    .select(
+      "id, title, title_ar, title_ur, description, description_ar, description_ur, category, event_date, start_time, end_time, location, speaker, registration_url, image_url"
+    )
     .eq("mosque_id", mosqueId);
 
   query = upcoming
@@ -25,5 +30,5 @@ export async function GET(request: NextRequest) {
   const { data, error } = await query.limit(Math.min(limit, 100));
   if (error) return NextResponse.json({ error: "Failed to load events" }, { status: 500 });
 
-  return NextResponse.json(data);
+  return NextResponse.json(resolveLocalizedFieldsForList(data ?? [], ["title", "description"], language));
 }

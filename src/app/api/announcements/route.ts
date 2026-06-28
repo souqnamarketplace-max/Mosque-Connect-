@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOnboardingState } from "@/lib/onboardingState";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getServerDict } from "@/lib/i18n/getServerDict";
+import { resolveLocalizedFieldsForList } from "@/lib/localizedFields";
 
 export async function GET(request: NextRequest) {
   const { mosqueId } = await getOnboardingState();
@@ -8,6 +10,7 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const limit = Number(searchParams.get("limit") ?? "50");
+  const { language } = await getServerDict();
 
   const supabase = await createServerSupabaseClient();
   const nowIso = new Date().toISOString();
@@ -15,7 +18,7 @@ export async function GET(request: NextRequest) {
   const { data, error } = await supabase
     .from("announcements")
     .select(
-      "id, category, title, body, image_url, pdf_url, link_url, is_pinned, publish_at, deceased_name, burial_time, burial_location, couple_names, ceremony_time, ceremony_location"
+      "id, category, title, title_ar, title_ur, body, body_ar, body_ur, image_url, pdf_url, link_url, is_pinned, publish_at, deceased_name, burial_time, burial_location, couple_names, ceremony_time, ceremony_location"
     )
     .eq("mosque_id", mosqueId)
     .lte("publish_at", nowIso)
@@ -25,5 +28,5 @@ export async function GET(request: NextRequest) {
     .limit(Math.min(limit, 100));
 
   if (error) return NextResponse.json({ error: "Failed to load announcements" }, { status: 500 });
-  return NextResponse.json(data);
+  return NextResponse.json(resolveLocalizedFieldsForList(data ?? [], ["title", "body"], language));
 }

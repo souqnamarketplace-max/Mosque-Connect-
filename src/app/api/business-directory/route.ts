@@ -4,6 +4,8 @@ import { getOnboardingState } from "@/lib/onboardingState";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getAuthenticatedUserId } from "@/lib/userAuth";
 import { checkRateLimit } from "@/lib/rateLimit";
+import { getServerDict } from "@/lib/i18n/getServerDict";
+import { resolveLocalizedFieldsForList } from "@/lib/localizedFields";
 
 const createSchema = z.object({
   businessName: z.string().min(1).max(150),
@@ -31,11 +33,14 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
+  const { language } = await getServerDict();
 
   const supabase = await createServerSupabaseClient();
   let query = supabase
     .from("business_directory")
-    .select("id, business_name, category, description, address, phone, website, logo_url")
+    .select(
+      "id, business_name, business_name_ar, business_name_ur, category, description, description_ar, description_ur, address, phone, website, logo_url"
+    )
     .eq("mosque_id", mosqueId)
     .eq("status", "approved");
 
@@ -43,7 +48,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await query.order("business_name", { ascending: true });
   if (error) return NextResponse.json({ error: "Failed to load directory" }, { status: 500 });
-  return NextResponse.json(data);
+  return NextResponse.json(resolveLocalizedFieldsForList(data ?? [], ["business_name", "description"], language));
 }
 
 export async function POST(request: NextRequest) {

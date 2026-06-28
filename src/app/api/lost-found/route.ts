@@ -4,6 +4,8 @@ import { getOnboardingState } from "@/lib/onboardingState";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getAuthenticatedUserId } from "@/lib/userAuth";
 import { checkRateLimit } from "@/lib/rateLimit";
+import { getServerDict } from "@/lib/i18n/getServerDict";
+import { resolveLocalizedFieldsForList } from "@/lib/localizedFields";
 
 const createSchema = z.object({
   postType: z.enum(["lost", "found"]),
@@ -22,18 +24,21 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status") ?? "open";
+  const { language } = await getServerDict();
 
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("lost_found_posts")
-    .select("id, post_type, category, title, description, image_url, location_note, contact_method, status, created_at, posted_by")
+    .select(
+      "id, post_type, category, title, title_ar, title_ur, description, description_ar, description_ur, image_url, location_note, contact_method, status, created_at, posted_by"
+    )
     .eq("mosque_id", mosqueId)
     .eq("status", status)
     .order("created_at", { ascending: false })
     .limit(100);
 
   if (error) return NextResponse.json({ error: "Failed to load posts" }, { status: 500 });
-  return NextResponse.json(data);
+  return NextResponse.json(resolveLocalizedFieldsForList(data ?? [], ["title", "description"], language));
 }
 
 export async function POST(request: NextRequest) {

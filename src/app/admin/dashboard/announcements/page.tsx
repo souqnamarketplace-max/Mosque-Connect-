@@ -5,6 +5,7 @@ import { Plus, Trash2, Pin, X, Filter } from "lucide-react";
 import { useAdminSession } from "@/lib/hooks/useAdminSession";
 import AdminDashboardShell from "@/components/admin/AdminDashboardShell";
 import PaginationControls from "@/components/admin/PaginationControls";
+import TranslatableInput, { type TranslatableField } from "@/components/admin/TranslatableInput";
 
 interface Announcement {
   id: string;
@@ -43,8 +44,8 @@ export default function AnnouncementsAdminPage() {
 
   const [form, setForm] = useState({
     category: "general" as (typeof CATEGORIES)[number],
-    title: "",
-    body: "",
+    title: { en: "", ar: "", ur: "" } as TranslatableField,
+    body: { en: "", ar: "", ur: "" } as TranslatableField,
     isPinned: false,
     deceasedName: "",
     burialTime: "",
@@ -76,8 +77,8 @@ export default function AnnouncementsAdminPage() {
   }, [ready, load]);
 
   const handleCreate = async () => {
-    if (!selectedMosqueId || !form.title.trim()) {
-      setError("Title is required");
+    if (!selectedMosqueId || !form.title.en.trim()) {
+      setError("Title (English) is required");
       return;
     }
     setSaving(true);
@@ -85,7 +86,23 @@ export default function AnnouncementsAdminPage() {
     const res = await fetch("/api/admin/announcements", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mosqueId: selectedMosqueId, ...form }),
+      body: JSON.stringify({
+        mosqueId: selectedMosqueId,
+        category: form.category,
+        title: form.title.en,
+        titleAr: form.title.ar || undefined,
+        titleUr: form.title.ur || undefined,
+        body: form.body.en || undefined,
+        bodyAr: form.body.ar || undefined,
+        bodyUr: form.body.ur || undefined,
+        isPinned: form.isPinned,
+        deceasedName: form.deceasedName || undefined,
+        burialTime: form.burialTime || undefined,
+        burialLocation: form.burialLocation || undefined,
+        coupleNames: form.coupleNames || undefined,
+        ceremonyTime: form.ceremonyTime || undefined,
+        ceremonyLocation: form.ceremonyLocation || undefined,
+      }),
     });
     setSaving(false);
     if (!res.ok) {
@@ -95,8 +112,8 @@ export default function AnnouncementsAdminPage() {
     }
     setForm({
       category: "general",
-      title: "",
-      body: "",
+      title: { en: "", ar: "", ur: "" },
+      body: { en: "", ar: "", ur: "" },
       isPinned: false,
       deceasedName: "",
       burialTime: "",
@@ -183,21 +200,19 @@ export default function AnnouncementsAdminPage() {
               </option>
             ))}
           </select>
-          <input
-            type="text"
+          <TranslatableInput
+            label="Title"
+            required
             placeholder="Title"
-              aria-label="Title"
-            value={form.title}
-            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-            className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
+            values={form.title}
+            onChange={(values) => setForm((f) => ({ ...f, title: values }))}
           />
-          <textarea
+          <TranslatableInput
+            label="Body"
             placeholder="Body (optional)"
-              aria-label="Body (optional)"
-            value={form.body}
-            onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))}
-            rows={3}
-            className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
+            multiline
+            values={form.body}
+            onChange={(values) => setForm((f) => ({ ...f, body: values }))}
           />
 
           {form.category === "funeral" && (
