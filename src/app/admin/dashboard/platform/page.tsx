@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, X, Copy, Check, Ban } from "lucide-react";
+import { Plus, X, Copy, Check, Ban, Filter } from "lucide-react";
+import PaginationControls from "@/components/admin/PaginationControls";
 
 interface Mosque {
   id: string;
@@ -31,6 +32,12 @@ export default function PlatformAdminPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [lastAcceptUrl, setLastAcceptUrl] = useState<string | null>(null);
 
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+
   const [form, setForm] = useState({ email: "", mosqueIds: [] as string[], role: "admin" as "owner" | "admin" | "editor" });
 
   useEffect(() => {
@@ -51,14 +58,24 @@ export default function PlatformAdminPage() {
   }, [router]);
 
   const load = useCallback(async () => {
+    const invitesParams = new URLSearchParams({ page: String(page), pageSize: "20" });
+    if (statusFilter) invitesParams.set("status", statusFilter);
+
     const [mosquesRes, invitesRes] = await Promise.all([
       fetch("/api/admin/mosques"),
-      fetch("/api/admin/invites"),
+      fetch(`/api/admin/invites?${invitesParams}`),
     ]);
     const mosquesData = await mosquesRes.json();
     setMosques(mosquesData.mosques ?? []);
-    setInvites(invitesRes.ok ? await invitesRes.json() : []);
-  }, []);
+    if (invitesRes.ok) {
+      const data = await invitesRes.json();
+      setInvites(data.items);
+      setTotalPages(data.totalPages);
+      setTotalCount(data.totalCount);
+    } else {
+      setInvites([]);
+    }
+  }, [page, statusFilter]);
 
   useEffect(() => {
     if (isPlatformAdmin) load();
@@ -108,7 +125,7 @@ export default function PlatformAdminPage() {
   };
 
   if (checking) {
-    return <div className="min-h-screen flex items-center justify-center text-ink/50">Checking access…</div>;
+    return <div className="min-h-screen flex items-center justify-center text-ink/60">Checking access…</div>;
   }
 
   return (
@@ -120,7 +137,7 @@ export default function PlatformAdminPage() {
 
       <main className="max-w-md mx-auto px-5 py-6">
         {lastAcceptUrl && (
-          <div className="bg-night-teal/10 border border-night-teal/30 rounded-xl p-4 mb-5">
+          <div role="status" className="bg-night-teal/10 border border-night-teal/30 rounded-xl p-4 mb-5">
             <p className="text-sm font-medium mb-1">Invite created. Share this link:</p>
             <p className="text-xs break-all bg-white rounded-lg p-2 mb-2">{lastAcceptUrl}</p>
             <button
@@ -131,7 +148,7 @@ export default function PlatformAdminPage() {
             >
               Copy link
             </button>
-            <p className="text-xs text-ink/50 mt-2">
+            <p className="text-xs text-ink/60 mt-2">
               Email delivery isn&apos;t set up yet — for now, send this link to the admin directly (e.g. via text or
               email).
             </p>
@@ -140,20 +157,52 @@ export default function PlatformAdminPage() {
 
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display text-lg">Mosque Admin Invites</h2>
-          <button
-            onClick={() => setShowForm((s) => !s)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-night-teal text-sand text-sm font-medium"
-          >
-            {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-            {showForm ? "Cancel" : "Invite"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowFilters((s) => !s)}
+              aria-label={showFilters ? "Hide filters" : "Show filters"}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium ${
+                statusFilter ? "bg-night-teal text-sand" : "bg-white text-ink/70 border border-sand-dark"
+              }`}
+            >
+              <Filter className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setShowForm((s) => !s)}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-night-teal text-sand text-sm font-medium"
+            >
+              {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              {showForm ? "Cancel" : "Invite"}
+            </button>
+          </div>
         </div>
+
+        {showFilters && (
+          <div className="bg-white rounded-2xl p-3 mb-4">
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+              aria-label="Filter by status"
+              className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5 text-sm"
+            >
+              <option value="">All invites</option>
+              <option value="pending">Pending</option>
+              <option value="accepted">Accepted</option>
+              <option value="revoked">Revoked</option>
+              <option value="expired">Expired</option>
+            </select>
+          </div>
+        )}
 
         {showForm && (
           <div className="bg-white rounded-2xl p-4 mb-5 space-y-3">
             <input
               type="email"
               placeholder="admin@email.com"
+              aria-label="Admin email address"
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
               className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
@@ -183,7 +232,7 @@ export default function PlatformAdminPage() {
               <option value="editor">Editor</option>
             </select>
 
-            {error && <p className="text-urgent text-sm">{error}</p>}
+            {error && <p className="text-urgent text-sm" role="alert">{error}</p>}
 
             <button
               onClick={handleCreateInvite}
@@ -196,39 +245,42 @@ export default function PlatformAdminPage() {
         )}
 
         {invites.length === 0 ? (
-          <p className="text-center text-ink/50 py-8">No invites yet.</p>
+          <p className="text-center text-ink/60 py-8">{statusFilter ? "No invites match this filter." : "No invites yet."}</p>
         ) : (
-          <div className="space-y-2">
-            {invites.map((invite) => (
-              <div key={invite.id} className="bg-white rounded-xl p-4 flex items-start gap-3">
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{invite.email}</p>
-                  <p className="text-xs text-ink/50">
-                    {invite.mosque_ids.length} mosque(s) · {invite.role} ·{" "}
-                    <span
-                      className={
-                        invite.status === "pending"
-                          ? "text-gold"
-                          : invite.status === "accepted"
-                          ? "text-night-teal"
-                          : "text-ink/40"
-                      }
-                    >
-                      {invite.status}
-                    </span>
-                  </p>
-                </div>
-                <button onClick={() => copyLink(invite)} className="text-ink/30 hover:text-night-teal p-1">
-                  {copiedId === invite.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                </button>
-                {invite.status === "pending" && (
-                  <button onClick={() => handleRevoke(invite.id)} className="text-ink/30 hover:text-urgent p-1">
-                    <Ban className="w-4 h-4" />
+          <>
+            <div className="space-y-2">
+              {invites.map((invite) => (
+                <div key={invite.id} className="bg-white rounded-xl p-4 flex items-start gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{invite.email}</p>
+                    <p className="text-xs text-ink/60">
+                      {invite.mosque_ids.length} mosque(s) · {invite.role} ·{" "}
+                      <span
+                        className={
+                          invite.status === "pending"
+                            ? "text-gold"
+                            : invite.status === "accepted"
+                            ? "text-night-teal"
+                            : "text-ink/60"
+                        }
+                      >
+                        {invite.status}
+                      </span>
+                    </p>
+                  </div>
+                  <button onClick={() => copyLink(invite)} className="text-ink/60 hover:text-night-teal p-1">
+                    {copiedId === invite.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   </button>
-                )}
-              </div>
-            ))}
-          </div>
+                  {invite.status === "pending" && (
+                    <button onClick={() => handleRevoke(invite.id)} className="text-ink/60 hover:text-urgent p-2">
+                      <Ban className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <PaginationControls page={page} totalPages={totalPages} totalCount={totalCount} onPageChange={setPage} />
+          </>
         )}
       </main>
     </div>

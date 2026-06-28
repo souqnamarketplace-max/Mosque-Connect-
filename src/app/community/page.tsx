@@ -17,10 +17,10 @@ export default function CommunityPage() {
 
   const ITEMS: CommunityItem[] = [
     { href: "/community/ramadan", icon: Moon, label: dict.community.ramadan, available: true },
-    { href: "/community/classes", icon: GraduationCap, label: dict.community.classes, available: false },
-    { href: "/community/volunteer", icon: HandHeart, label: dict.community.volunteer, available: false },
+    { href: "/community/classes", icon: GraduationCap, label: dict.community.classes, available: true },
+    { href: "/community/volunteer", icon: HandHeart, label: dict.community.volunteer, available: true },
     { href: "/community/lost-found", icon: Search, label: dict.community.lostFound, available: true },
-    { href: "/community/directory", icon: Store, label: dict.community.directory, available: false },
+    { href: "/community/directory", icon: Store, label: dict.community.directory, available: true },
     { href: "/announcements", icon: Heart, label: dict.community.funeralNikah, available: true },
   ];
 
@@ -47,9 +47,9 @@ export default function CommunityPage() {
               className="flex items-center gap-3 bg-white/60 rounded-xl p-4 opacity-60"
               aria-disabled="true"
             >
-              <Icon className="w-5 h-5 text-ink/30 flex-shrink-0" />
-              <span className="flex-1 text-ink/50">{label}</span>
-              <span className="text-xs text-ink/40 bg-sand-dark px-2 py-1 rounded-full">Coming soon</span>
+              <Icon className="w-5 h-5 text-ink/60 flex-shrink-0" />
+              <span className="flex-1 text-ink/60">{label}</span>
+              <span className="text-xs text-ink/60 bg-sand-dark px-2 py-1 rounded-full">Coming soon</span>
             </div>
           )
         )}

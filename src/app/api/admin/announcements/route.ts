@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/serviceRole";
 import { sendSmartNotification } from "@/lib/push/sendSmartNotification";
 import { logAdminAction } from "@/lib/adminAudit";
+import { parsePagination, rangeFor, buildPaginatedResponse } from "@/lib/pagination";
 
 const createSchema = z.object({
   mosqueId: z.string().uuid(),
@@ -34,16 +35,22 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const category = searchParams.get("category");
+  const pagination = parsePagination(searchParams);
+  const [from, to] = rangeFor(pagination);
+
   const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("announcements")
-    .select("*")
-    .eq("mosque_id", mosqueId)
-    .order("publish_at", { ascending: false })
-    .limit(50);
+    .select("*", { count: "exact" })
+    .eq("mosque_id", mosqueId);
+
+  if (category) query = query.eq("category", category);
+
+  const { data, error, count } = await query.order("publish_at", { ascending: false }).range(from, to);
 
   if (error) return NextResponse.json({ error: "Failed to load announcements" }, { status: 500 });
-  return NextResponse.json(data);
+  return NextResponse.json(buildPaginatedResponse(data ?? [], count ?? 0, pagination));
 }
 
 export async function POST(request: NextRequest) {

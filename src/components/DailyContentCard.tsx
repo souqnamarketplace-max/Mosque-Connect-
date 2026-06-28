@@ -40,7 +40,7 @@ export default function DailyContentCard({
       <p className={`leading-relaxed ${language === "ar" ? "text-right" : ""}`} dir={language === "ar" ? "rtl" : "ltr"}>
         {content.text}
       </p>
-      {content.sourceReference && <p className="text-xs text-ink/40 mt-2">— {content.sourceReference}</p>}
+      {content.sourceReference && <p className="text-xs text-ink/60 mt-2">— {content.sourceReference}</p>}
     </div>
   );
 }

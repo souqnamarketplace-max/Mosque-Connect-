@@ -57,7 +57,7 @@ export default function NotificationSettingsPage() {
   };
 
   if (loading || !prefs) {
-    return <div className="p-6 text-center text-ink/50">{dict.common.loading}</div>;
+    return <div className="p-6 text-center text-ink/60">{dict.common.loading}</div>;
   }
 
   return (
@@ -81,13 +81,13 @@ export default function NotificationSettingsPage() {
           </div>
 
           {permissionState === "unsupported" && (
-            <p className="text-sm text-ink/50 bg-sand-dark/30 rounded-lg p-3">{dict.notificationSettings.unsupported}</p>
+            <p className="text-sm text-ink/60 bg-sand-dark/30 rounded-lg p-3">{dict.notificationSettings.unsupported}</p>
           )}
           {permissionState === "denied" && (
             <p className="text-sm text-urgent bg-urgent/10 rounded-lg p-3">{dict.notificationSettings.permissionDenied}</p>
           )}
           {permissionState === "granted" && (
-            <p className="text-sm text-night-teal bg-night-teal/10 rounded-lg p-3">✓ Enabled</p>
+            <p role="status" className="text-sm text-night-teal bg-night-teal/10 rounded-lg p-3">✓ Enabled</p>
           )}
           {permissionState === "default" && (
             <button
@@ -103,10 +103,10 @@ export default function NotificationSettingsPage() {
         {/* Quiet hours */}
         <div>
           <h2 className="text-sm font-medium text-ink/60 mb-1">{dict.notificationSettings.quietHours}</h2>
-          <p className="text-xs text-ink/50 mb-2">{dict.notificationSettings.quietHoursDesc}</p>
+          <p className="text-xs text-ink/60 mb-2">{dict.notificationSettings.quietHoursDesc}</p>
           <div className="bg-white rounded-2xl p-4 grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-ink/50 mb-1">{dict.notificationSettings.from}</label>
+              <label className="block text-xs text-ink/60 mb-1">{dict.notificationSettings.from}</label>
               <input
                 type="time"
                 value={prefs.quiet_hours_start ?? ""}
@@ -115,7 +115,7 @@ export default function NotificationSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs text-ink/50 mb-1">{dict.notificationSettings.to}</label>
+              <label className="block text-xs text-ink/60 mb-1">{dict.notificationSettings.to}</label>
               <input
                 type="time"
                 value={prefs.quiet_hours_end ?? ""}
@@ -142,7 +142,7 @@ export default function NotificationSettingsPage() {
               <ToggleSwitch checked={prefs.notify_new_events} onChange={(v) => save({ notify_new_events: v })} />
             </div>
           </div>
-          <p className="text-xs text-ink/40 mt-2">{dict.notificationSettings.emergencyNote}</p>
+          <p className="text-xs text-ink/60 mt-2">{dict.notificationSettings.emergencyNote}</p>
         </div>
       </main>
     </div>

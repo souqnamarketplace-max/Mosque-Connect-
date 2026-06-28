@@ -48,7 +48,7 @@ export default function LiveStreamPage() {
   const locale = language === "ar" ? "ar" : language === "ur" ? "ur" : "en-US";
 
   if (loading) {
-    return <div className="min-h-screen bg-sand p-6 text-center text-ink/50 text-lg">{dict.common.loading}</div>;
+    return <div className="min-h-screen bg-sand p-6 text-center text-ink/60 text-lg">{dict.common.loading}</div>;
   }
 
   const embedUrl = data?.live ? toEmbedUrl(data.live.stream_url ?? "", data.live.source) : null;
@@ -97,8 +97,8 @@ export default function LiveStreamPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-            <Radio className="w-10 h-10 text-ink/30" />
-            <p className="text-ink/50 text-lg">{dict.liveStream.offline}</p>
+            <Radio className="w-10 h-10 text-ink/60" />
+            <p className="text-ink/60 text-lg">{dict.liveStream.offline}</p>
           </div>
         )}
 
@@ -120,7 +120,7 @@ export default function LiveStreamPage() {
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{rec.title ?? dict.liveStream.title}</p>
                     {rec.ended_at && (
-                      <p className="text-xs text-ink/50">
+                      <p className="text-xs text-ink/60">
                         {new Date(rec.ended_at).toLocaleDateString(locale, { month: "short", day: "numeric", year: "numeric" })}
                       </p>
                     )}

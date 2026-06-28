@@ -75,7 +75,7 @@ export default function LiveStreamAdminPage() {
   };
 
   if (!ready) {
-    return <div className="min-h-screen flex items-center justify-center text-ink/50">Checking access…</div>;
+    return <div className="min-h-screen flex items-center justify-center text-ink/60">Checking access…</div>;
   }
 
   return (
@@ -89,7 +89,7 @@ export default function LiveStreamAdminPage() {
       <h2 className="font-display text-lg mb-4">Live Stream</h2>
 
       {loading ? (
-        <p className="text-center text-ink/50 py-8">Loading…</p>
+        <p className="text-center text-ink/60 py-8">Loading…</p>
       ) : liveStream ? (
         <div className="bg-night-teal text-sand rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-2">
@@ -104,9 +104,10 @@ export default function LiveStreamAdminPage() {
           <input
             type="url"
             placeholder="Recording URL to save (optional)"
+              aria-label="Recording URL to save (optional)"
             value={recordingUrlInput}
             onChange={(e) => setRecordingUrlInput(e.target.value)}
-            className="w-full bg-sand/10 rounded-lg px-3 py-2.5 text-sand placeholder:text-sand/40 mb-3"
+            className="w-full bg-sand/10 rounded-lg px-3 py-2.5 text-sand placeholder:text-sand/60 mb-3"
           />
 
           <button
@@ -124,6 +125,7 @@ export default function LiveStreamAdminPage() {
           <input
             type="text"
             placeholder="Title (optional, e.g. Friday Khutbah)"
+              aria-label="Title (optional, e.g. Friday Khutbah)"
             value={form.title}
             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
             className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
@@ -140,11 +142,12 @@ export default function LiveStreamAdminPage() {
           <input
             type="url"
             placeholder="Stream URL"
+              aria-label="Stream URL"
             value={form.streamUrl}
             onChange={(e) => setForm((f) => ({ ...f, streamUrl: e.target.value }))}
             className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
           />
-          {error && <p className="text-urgent text-sm">{error}</p>}
+          {error && <p className="text-urgent text-sm" role="alert">{error}</p>}
           <button
             onClick={handleGoLive}
             disabled={saving}

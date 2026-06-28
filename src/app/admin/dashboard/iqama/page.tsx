@@ -87,7 +87,7 @@ export default function IqamaTimesAdminPage() {
   };
 
   if (!ready) {
-    return <div className="min-h-screen flex items-center justify-center text-ink/50">Checking access…</div>;
+    return <div className="min-h-screen flex items-center justify-center text-ink/60">Checking access…</div>;
   }
 
   return (
@@ -99,7 +99,7 @@ export default function IqamaTimesAdminPage() {
       logout={logout}
     >
       {mosques.length === 0 ? (
-        <p className="text-center text-ink/50 py-12">No mosques assigned to your account yet.</p>
+        <p className="text-center text-ink/60 py-12">No mosques assigned to your account yet.</p>
       ) : (
         <div>
           <h2 className="font-display text-lg mb-3">Iqama Times</h2>

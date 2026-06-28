@@ -61,7 +61,7 @@ export default function AdminLoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-sand/10 text-sand placeholder:text-sand/40 focus:outline-none focus:ring-2 focus:ring-gold"
+              className="w-full px-4 py-3 rounded-xl bg-sand/10 text-sand placeholder:text-sand/60 focus:outline-none focus:ring-2 focus:ring-gold"
               placeholder="admin@yourmosque.org"
             />
           </div>
@@ -75,12 +75,12 @@ export default function AdminLoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-sand/10 text-sand placeholder:text-sand/40 focus:outline-none focus:ring-2 focus:ring-gold"
+              className="w-full px-4 py-3 rounded-xl bg-sand/10 text-sand placeholder:text-sand/60 focus:outline-none focus:ring-2 focus:ring-gold"
               placeholder="••••••••"
             />
           </div>
 
-          {error && <p className="text-urgent text-sm bg-urgent/10 rounded-lg px-3 py-2">{error}</p>}
+          {error && <p className="text-urgent text-sm bg-urgent/10 rounded-lg px-3 py-2" role="alert">{error}</p>}
 
           <button
             type="submit"
@@ -91,7 +91,7 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-sand/40 text-xs mt-8">
+        <p className="text-center text-sand/60 text-xs mt-8">
           Don&apos;t have admin access yet? Contact your platform administrator for an invite.
         </p>
       </main>

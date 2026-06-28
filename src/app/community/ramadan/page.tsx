@@ -53,7 +53,7 @@ export default function RamadanSchedulePage() {
           </div>
         ) : days.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-16 text-center">
-            <Moon className="w-10 h-10 text-ink/30" />
+            <Moon className="w-10 h-10 text-ink/60" />
             <p className="text-ink/60 text-lg">{dict.ramadanPage.notPublished}</p>
           </div>
         ) : (
@@ -75,7 +75,7 @@ export default function RamadanSchedulePage() {
                           {dict.ramadanPage.today}
                         </span>
                       )}
-                      <span className={`text-xs ${isToday ? "text-sand/60" : "text-ink/40"}`}>
+                      <span className={`text-xs ${isToday ? "text-sand/60" : "text-ink/60"}`}>
                         {new Date(day.gregorian_date + "T12:00:00Z").toLocaleDateString(locale, {
                           month: "short",
                           day: "numeric",
@@ -85,16 +85,16 @@ export default function RamadanSchedulePage() {
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-sm">
                     <div>
-                      <p className={`text-xs ${isToday ? "text-sand/60" : "text-ink/40"}`}>{dict.ramadanPage.suhoorEnds}</p>
+                      <p className={`text-xs ${isToday ? "text-sand/60" : "text-ink/60"}`}>{dict.ramadanPage.suhoorEnds}</p>
                       <p className="tabular-nums font-medium">{day.suhoor_end.substring(0, 5)}</p>
                     </div>
                     <div>
-                      <p className={`text-xs ${isToday ? "text-sand/60" : "text-ink/40"}`}>{dict.ramadanPage.iftar}</p>
+                      <p className={`text-xs ${isToday ? "text-sand/60" : "text-ink/60"}`}>{dict.ramadanPage.iftar}</p>
                       <p className="tabular-nums font-medium">{day.iftar_time.substring(0, 5)}</p>
                     </div>
                     {day.taraweeh_time && (
                       <div>
-                        <p className={`text-xs ${isToday ? "text-sand/60" : "text-ink/40"}`}>{dict.ramadanPage.taraweeh}</p>
+                        <p className={`text-xs ${isToday ? "text-sand/60" : "text-ink/60"}`}>{dict.ramadanPage.taraweeh}</p>
                         <p className="tabular-nums font-medium">{day.taraweeh_time.substring(0, 5)}</p>
                       </div>
                     )}

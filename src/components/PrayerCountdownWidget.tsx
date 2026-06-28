@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { PrayerTimesPayload, getNextEvent, formatCountdown, PrayerCode } from "@/lib/prayerTime";
 import { useI18n } from "@/lib/i18n/I18nProvider";
+import { cachePrayerPayload, getCachedPrayerPayload, getMostRecentCachedPayload } from "@/lib/offline/prayerCache";
+import { WifiOff } from "lucide-react";
 
 interface Props {
   mosqueId: string;
@@ -22,6 +24,8 @@ export default function PrayerCountdownWidget({ mosqueId }: Props) {
   const [state, setState] = useState<WidgetState>("loading");
   const [now, setNow] = useState(new Date());
   const [expanded, setExpanded] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
+  const [staleSince, setStaleSince] = useState<string | null>(null);
 
   const prayerLabels: Record<PrayerCode, string> = {
     fajr: dict.prayers.fajr,
@@ -33,13 +37,39 @@ export default function PrayerCountdownWidget({ mosqueId }: Props) {
 
   const fetchPayload = useCallback(async () => {
     setState("loading");
+    const todayStr = new Date().toISOString().substring(0, 10);
+
     try {
       const res = await fetch(`/api/prayer-times/today?mosque_id=${mosqueId}`);
       if (!res.ok) throw new Error("fetch failed");
       const data: PrayerTimesPayload = await res.json();
       setPayload(data);
       setState("ready");
+      setIsOffline(false);
+      setStaleSince(null);
+      // Cache on every successful fetch so this exact day's schedule is
+      // available offline later, including for the rest of today.
+      cachePrayerPayload(mosqueId, todayStr, data);
     } catch {
+      // Network (or server) failed — try today's cache first, then fall
+      // back to whatever was most recently cached for this mosque at all,
+      // rather than immediately giving up and showing "unavailable."
+      const todayCache = await getCachedPrayerPayload(mosqueId, todayStr);
+      if (todayCache) {
+        setPayload(todayCache.payload as PrayerTimesPayload);
+        setState("ready");
+        setIsOffline(true);
+        setStaleSince(null); // same-day cache isn't "stale" in the sense that matters, just offline
+        return;
+      }
+      const fallback = await getMostRecentCachedPayload(mosqueId);
+      if (fallback) {
+        setPayload(fallback.payload as PrayerTimesPayload);
+        setState("ready");
+        setIsOffline(true);
+        setStaleSince(fallback.date);
+        return;
+      }
       setState("error");
     }
   }, [mosqueId]);
@@ -133,6 +163,12 @@ export default function PrayerCountdownWidget({ mosqueId }: Props) {
 
   return (
     <div className="flex flex-col items-center">
+      {isOffline && (
+        <div className="flex items-center gap-1.5 text-xs text-ink/60 bg-sand-dark/40 px-3 py-1 rounded-full mb-2">
+          <WifiOff className="w-3 h-3" />
+          {staleSince ? `${dict.home.offlineShowingStale} ${staleSince}` : dict.home.offlineShowingToday}
+        </div>
+      )}
       <button
         onClick={() => setExpanded(true)}
         className="relative w-64 h-64 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-full"
@@ -236,7 +272,7 @@ function ScheduleSheet({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="w-10 h-1.5 bg-sand-dark rounded-full mx-auto mb-5" />
-        <h3 className="font-display text-xl mb-4">{scheduleTitle}</h3>
+        <h2 className="font-display text-xl mb-4">{scheduleTitle}</h2>
         <div className="space-y-2">
           {prayers.map((p) => {
             const isCurrent = nextEvent.prayer === p.code;

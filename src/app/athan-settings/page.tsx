@@ -74,7 +74,7 @@ export default function AthanSettingsPage() {
   };
 
   if (loading || !prefs) {
-    return <div className="p-6 text-center text-ink/50">{dict.common.loading}</div>;
+    return <div className="p-6 text-center text-ink/60">{dict.common.loading}</div>;
   }
 
   return (
@@ -84,7 +84,7 @@ export default function AthanSettingsPage() {
           <ChevronLeft className="w-6 h-6 rtl:rotate-180" />
         </button>
         <h1 className="font-display text-xl">{dict.athan.title}</h1>
-        {saving && <span className="text-xs text-ink/40 ms-auto">{dict.common.saving}</span>}
+        {saving && <span className="text-xs text-ink/60 ms-auto">{dict.common.saving}</span>}
       </header>
 
       <main className="max-w-md mx-auto px-5 pb-16 space-y-6">
@@ -114,7 +114,7 @@ export default function AthanSettingsPage() {
         <div className="bg-white rounded-2xl p-4">
           <div className="flex justify-between text-sm mb-2">
             <span className="font-medium">{dict.athan.volume}</span>
-            <span className="text-ink/50">{Math.round(prefs.volume * 100)}%</span>
+            <span className="text-ink/60">{Math.round(prefs.volume * 100)}%</span>
           </div>
           <input
             type="range"

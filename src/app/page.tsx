@@ -52,7 +52,7 @@ export default async function HomePage() {
         <p className="text-sm text-ink/60">{greeting}</p>
         <h1 className="font-display text-2xl mt-1">{mosque.name}</h1>
         <p className="text-xs uppercase tracking-widest text-sage mt-1">{todayLabel}</p>
-        <p className="text-xs text-ink/40 mt-0.5">{hijriLabel}</p>
+        <p className="text-xs text-ink/60 mt-0.5">{hijriLabel}</p>
       </header>
 
       <main className="max-w-md mx-auto px-5">

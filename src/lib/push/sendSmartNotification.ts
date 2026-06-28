@@ -1,11 +1,38 @@
 import webpush from "web-push";
 import { createServiceRoleClient } from "@/lib/supabase/serviceRole";
 
-webpush.setVapidDetails(
-  process.env.VAPID_CONTACT_EMAIL!,
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+let vapidConfigured = false;
+
+/**
+ * Configures web-push lazily, on first actual send attempt, rather than at
+ * module load time. The original version called webpush.setVapidDetails()
+ * at the top of this file, which ran during Next.js's build-time page-data
+ * collection for every route that imports this module — if the VAPID env
+ * vars aren't set (e.g. not yet added in Vercel), that threw and failed the
+ * entire production build, taking down unrelated routes like
+ * /api/admin/announcements with it. Configuring on demand, and treating a
+ * missing key as "push isn't configured yet" rather than a fatal error,
+ * means a missing env var degrades to "no push sent" instead of "the whole
+ * app won't deploy."
+ */
+function ensureVapidConfigured(): boolean {
+  if (vapidConfigured) return true;
+
+  const email = process.env.VAPID_CONTACT_EMAIL;
+  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const privateKey = process.env.VAPID_PRIVATE_KEY;
+
+  if (!email || !publicKey || !privateKey) {
+    console.warn(
+      "Push notifications are not configured (missing VAPID_CONTACT_EMAIL / NEXT_PUBLIC_VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY). Skipping send."
+    );
+    return false;
+  }
+
+  webpush.setVapidDetails(email, publicKey, privateKey);
+  vapidConfigured = true;
+  return true;
+}
 
 export type NotificationCategory =
   | "prayer_reminder"
@@ -81,6 +108,11 @@ export async function sendSmartNotification(options: SendOptions): Promise<void>
 
   if (!subscriptions || subscriptions.length === 0) {
     await logDelivery(supabase, options, "skipped_opted_out");
+    return;
+  }
+
+  if (!ensureVapidConfigured()) {
+    await logDelivery(supabase, options, "failed");
     return;
   }
 

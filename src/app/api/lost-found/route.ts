@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getOnboardingState } from "@/lib/onboardingState";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getAuthenticatedUserId } from "@/lib/userAuth";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 const createSchema = z.object({
   postType: z.enum(["lost", "found"]),
@@ -44,6 +45,14 @@ export async function POST(request: NextRequest) {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return NextResponse.json({ error: "No session. Call /api/auth/ensure-session first." }, { status: 401 });
+  }
+
+  const rateLimit = await checkRateLimit("lostFoundPost", request, userId);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many posts. Please wait a few minutes before posting again." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil((rateLimit.reset - Date.now()) / 1000)) } }
+    );
   }
 
   const parsed = createSchema.safeParse(await request.json());

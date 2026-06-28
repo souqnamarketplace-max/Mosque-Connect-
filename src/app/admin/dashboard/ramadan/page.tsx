@@ -66,7 +66,7 @@ export default function RamadanAdminPage() {
   };
 
   if (!ready) {
-    return <div className="min-h-screen flex items-center justify-center text-ink/50">Checking access…</div>;
+    return <div className="min-h-screen flex items-center justify-center text-ink/60">Checking access…</div>;
   }
 
   return (
@@ -89,6 +89,7 @@ export default function RamadanAdminPage() {
           <input
             type="number"
             placeholder="Hijri year (e.g. 1448)"
+              aria-label="Hijri year (e.g. 1448)"
             value={form.ramadanYearHijri}
             onChange={(e) => setForm((f) => ({ ...f, ramadanYearHijri: Number(e.target.value) }))}
             className="bg-sand-dark/30 rounded-lg px-3 py-2.5"
@@ -103,11 +104,12 @@ export default function RamadanAdminPage() {
         <input
           type="time"
           placeholder="Taraweeh time (optional, applied to all days)"
+              aria-label="Taraweeh time (optional, applied to all days)"
           value={form.taraweehTime}
           onChange={(e) => setForm((f) => ({ ...f, taraweehTime: e.target.value }))}
           className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
         />
-        {error && <p className="text-urgent text-sm">{error}</p>}
+        {error && <p className="text-urgent text-sm" role="alert">{error}</p>}
         {success && <p className="text-night-teal text-sm">{success}</p>}
         <button
           onClick={handleGenerate}
@@ -120,7 +122,7 @@ export default function RamadanAdminPage() {
       </div>
 
       {loading ? (
-        <p className="text-center text-ink/50 py-8">Loading…</p>
+        <p className="text-center text-ink/60 py-8">Loading…</p>
       ) : days.length > 0 ? (
         <div className="space-y-1.5">
           {days.map((day) => (

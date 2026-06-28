@@ -57,7 +57,7 @@ export default function LanguageSelectionPage() {
               }`}
             >
               <span className="font-display text-lg block">{lang.nativeLabel}</span>
-              {lang.code !== "en" && <span className="text-xs text-ink/50">{lang.englishLabel}</span>}
+              {lang.code !== "en" && <span className="text-xs text-ink/60">{lang.englishLabel}</span>}
             </button>
           ))}
         </div>

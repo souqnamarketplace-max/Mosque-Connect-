@@ -71,7 +71,7 @@ export default function MosqueProfileAdminPage() {
   };
 
   if (!ready) {
-    return <div className="min-h-screen flex items-center justify-center text-ink/50">Checking access…</div>;
+    return <div className="min-h-screen flex items-center justify-center text-ink/60">Checking access…</div>;
   }
 
   return (
@@ -85,7 +85,7 @@ export default function MosqueProfileAdminPage() {
       <h2 className="font-display text-lg mb-4">Mosque Profile</h2>
 
       {loading ? (
-        <p className="text-center text-ink/50 py-8">Loading…</p>
+        <p className="text-center text-ink/60 py-8">Loading…</p>
       ) : (
         <div className="bg-white rounded-2xl p-4 space-y-3">
           <Field label="Description">
@@ -132,6 +132,7 @@ export default function MosqueProfileAdminPage() {
             <input
               type="text"
               placeholder="e.g. Mon–Fri 9am–5pm"
+              aria-label="e.g. Mon–Fri 9am–5pm"
               value={form.officeHours}
               onChange={(e) => setForm((f) => ({ ...f, officeHours: e.target.value }))}
               className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
@@ -146,7 +147,7 @@ export default function MosqueProfileAdminPage() {
             />
           </Field>
 
-          {saved && <p className="text-night-teal text-sm">Profile saved.</p>}
+          {saved && <p role="status" className="text-night-teal text-sm">Profile saved.</p>}
 
           <button
             onClick={handleSave}

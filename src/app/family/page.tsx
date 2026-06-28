@@ -67,11 +67,14 @@ export default function FamilyAccountPage() {
 
   const handleInvite = async () => {
     setInvitingLoading(true);
+    setError(null);
     const res = await fetch("/api/family/invite", { method: "POST" });
     const data = await res.json();
     setInvitingLoading(false);
     if (res.ok) {
       setInviteUrl(`${window.location.origin}${data.acceptUrl}`);
+    } else {
+      setError(data.error ?? "Failed to create invite");
     }
   };
 
@@ -94,7 +97,7 @@ export default function FamilyAccountPage() {
   const isOwner = members.find((m) => m.user_id === currentUserId)?.is_account_owner ?? false;
 
   if (loading) {
-    return <div className="min-h-screen bg-sand p-6 text-center text-ink/50 text-lg">{dict.common.loading}</div>;
+    return <div className="min-h-screen bg-sand p-6 text-center text-ink/60 text-lg">{dict.common.loading}</div>;
   }
 
   return (
@@ -109,12 +112,13 @@ export default function FamilyAccountPage() {
       <main className="max-w-md mx-auto px-5">
         {!family ? (
           <div className="flex flex-col items-center gap-4 py-10 text-center">
-            <Users className="w-10 h-10 text-ink/30" />
+            <Users className="w-10 h-10 text-ink/60" />
             <p className="text-ink/60">{dict.family.noFamilyYet}</p>
             <div className="w-full bg-white rounded-2xl p-4 space-y-3 text-left">
               <input
                 type="text"
                 placeholder={dict.family.yourName}
+              aria-label={dict.family.yourName}
                 value={createForm.displayName}
                 onChange={(e) => setCreateForm((f) => ({ ...f, displayName: e.target.value }))}
                 className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
@@ -122,11 +126,12 @@ export default function FamilyAccountPage() {
               <input
                 type="text"
                 placeholder={dict.family.familyNameOptional}
+              aria-label={dict.family.familyNameOptional}
                 value={createForm.name}
                 onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
                 className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
               />
-              {error && <p className="text-urgent text-sm">{error}</p>}
+              {error && <p className="text-urgent text-sm" role="alert">{error}</p>}
               <button
                 onClick={handleCreate}
                 disabled={creating}
@@ -149,12 +154,12 @@ export default function FamilyAccountPage() {
                       <span className="font-medium">{member.display_name}</span>
                       {member.is_account_owner && <Crown className="w-3.5 h-3.5 text-gold" />}
                     </div>
-                    {member.relationship && <p className="text-xs text-ink/50">{member.relationship}</p>}
+                    {member.relationship && <p className="text-xs text-ink/60">{member.relationship}</p>}
                   </div>
                   {(isOwner || member.user_id === currentUserId) && (
                     <button
                       onClick={() => handleRemove(member.id, member.user_id === currentUserId)}
-                      className="text-ink/30 hover:text-urgent p-1"
+                      className="text-ink/60 hover:text-urgent p-2"
                       aria-label={dict.family.removeMember}
                     >
                       <X className="w-4 h-4" />
@@ -178,14 +183,17 @@ export default function FamilyAccountPage() {
                     </button>
                   </>
                 ) : (
-                  <button
-                    onClick={handleInvite}
-                    disabled={invitingLoading}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-full bg-night-teal text-sand font-medium disabled:opacity-50"
-                  >
-                    <Plus className="w-4 h-4" />
-                    {invitingLoading ? "Creating…" : dict.family.inviteMember}
-                  </button>
+                  <>
+                    {error && <p className="text-urgent text-sm mb-2" role="alert">{error}</p>}
+                    <button
+                      onClick={handleInvite}
+                      disabled={invitingLoading}
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-full bg-night-teal text-sand font-medium disabled:opacity-50"
+                    >
+                      <Plus className="w-4 h-4" />
+                      {invitingLoading ? "Creating…" : dict.family.inviteMember}
+                    </button>
+                  </>
                 )}
               </div>
             )}

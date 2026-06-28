@@ -174,8 +174,8 @@ function SettingsRow({
     <Link href={href} className="flex items-center gap-3 p-4 hover:bg-sand-dark/30 transition-colors">
       <Icon className="w-4 h-4 text-night-teal flex-shrink-0" />
       <span className="flex-1">{label}</span>
-      {value && <span className="text-sm text-ink/50">{value}</span>}
-      <ChevronRight className="w-4 h-4 text-ink/30 rtl:rotate-180" />
+      {value && <span className="text-sm text-ink/60">{value}</span>}
+      <ChevronRight className="w-4 h-4 text-ink/60 rtl:rotate-180" />
     </Link>
   );
 }

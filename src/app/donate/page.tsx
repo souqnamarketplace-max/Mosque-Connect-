@@ -42,7 +42,7 @@ export default function DonatePage() {
   const finalAmount = customAmount ? parseFloat(customAmount) : amount;
 
   if (loading) {
-    return <div className="min-h-screen bg-sand p-6 text-center text-ink/50 text-lg">{dict.common.loading}</div>;
+    return <div className="min-h-screen bg-sand p-6 text-center text-ink/60 text-lg">{dict.common.loading}</div>;
   }
 
   return (
@@ -56,7 +56,7 @@ export default function DonatePage() {
 
       <main className="max-w-md mx-auto px-5 pb-16">
         {campaigns.length === 0 ? (
-          <p className="text-center text-ink/50 text-lg py-12">{dict.donate.noActiveCampaigns}</p>
+          <p className="text-center text-ink/60 text-lg py-12">{dict.donate.noActiveCampaigns}</p>
         ) : (
           <>
             {campaigns.length > 1 && (
@@ -146,6 +146,7 @@ export default function DonatePage() {
               type="number"
               inputMode="decimal"
               placeholder={dict.donate.customAmount}
+              aria-label={dict.donate.customAmount}
               value={customAmount}
               onChange={(e) => {
                 setCustomAmount(e.target.value);

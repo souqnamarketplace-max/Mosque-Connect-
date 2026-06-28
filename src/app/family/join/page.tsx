@@ -52,7 +52,7 @@ function JoinFamilyContent() {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-sand flex items-center justify-center text-ink/50">{dict.common.loading}</div>;
+    return <div className="min-h-screen bg-sand flex items-center justify-center text-ink/60">{dict.common.loading}</div>;
   }
 
   if (error && !familyName) {
@@ -81,12 +81,13 @@ function JoinFamilyContent() {
             type="text"
             required
             placeholder={dict.family.yourName}
+              aria-label={dict.family.yourName}
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-white border border-sand-dark focus:outline-none focus:ring-2 focus:ring-night-teal"
           />
 
-          {error && <p className="text-urgent text-sm bg-urgent/10 rounded-lg px-3 py-2">{error}</p>}
+          {error && <p className="text-urgent text-sm bg-urgent/10 rounded-lg px-3 py-2" role="alert">{error}</p>}
 
           <button
             type="submit"

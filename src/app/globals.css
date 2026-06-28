@@ -9,7 +9,8 @@
   --color-gold-light: #e0b658;
   --color-urgent: #c1502e;
   --color-ink: #2b2622;
-  --color-sage: #8fa89c;
+  --color-sage: #5d6d65; /* WCAG fix 2026-06-26: was #8fa89c (2.28:1 on sand, fails AA);
+    darkened to 4.90:1, same hue family, passes AA for normal text */
 
   --font-display: Georgia, "Times New Roman", serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
@@ -36,4 +37,22 @@ body {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* WCAG 2.2 (2.4.11/2.4.13 Focus Appearance): every interactive element gets
+ * a clearly visible, brand-consistent focus indicator by default, not just
+ * the handful of components with an explicit focus:ring class. Using
+ * :focus-visible (not :focus) so this only shows for keyboard/assistive-tech
+ * navigation, not for every mouse click, matching modern browser behavior
+ * and avoiding visual noise for touch/mouse users. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

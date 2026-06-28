@@ -84,7 +84,7 @@ function MosqueSelectionContent() {
             ))}
           </div>
         ) : mosques.length === 0 ? (
-          <p className="text-center text-ink/50 py-8">{dict.onboarding.mosque.empty}</p>
+          <p className="text-center text-ink/60 py-8">{dict.onboarding.mosque.empty}</p>
         ) : (
           <div className="space-y-3">
             {mosques.map((mosque) => (
@@ -106,7 +106,7 @@ function MosqueSelectionContent() {
                   <div className="flex-1 min-w-0">
                     <p className="font-display text-base">{mosque.name}</p>
                     {mosque.address && (
-                      <p className="text-xs text-ink/50 flex items-center gap-1 mt-0.5">
+                      <p className="text-xs text-ink/60 flex items-center gap-1 mt-0.5">
                         <MapPinned className="w-3 h-3 flex-shrink-0" />
                         {mosque.address}
                       </p>

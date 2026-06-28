@@ -108,6 +108,7 @@ export default function LostFoundPage() {
         <h1 className="font-display text-xl flex-1">{dict.lostFound.title}</h1>
         <button
           onClick={() => setShowForm((s) => !s)}
+          aria-label={showForm ? "Cancel" : dict.lostFound.reportLost}
           className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-night-teal text-sand text-sm font-medium"
         >
           {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
@@ -146,12 +147,14 @@ export default function LostFoundPage() {
             <input
               type="text"
               placeholder={dict.lostFound.itemTitle}
+              aria-label={dict.lostFound.itemTitle}
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
               className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
             />
             <textarea
               placeholder={dict.lostFound.description}
+              aria-label={dict.lostFound.description}
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               rows={2}
@@ -160,6 +163,7 @@ export default function LostFoundPage() {
             <input
               type="text"
               placeholder={dict.lostFound.locationNote}
+              aria-label={dict.lostFound.locationNote}
               value={form.locationNote}
               onChange={(e) => setForm((f) => ({ ...f, locationNote: e.target.value }))}
               className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
@@ -183,13 +187,14 @@ export default function LostFoundPage() {
               <input
                 type="text"
                 placeholder={dict.lostFound.contactValue}
+              aria-label={dict.lostFound.contactValue}
                 value={form.contactValue}
                 onChange={(e) => setForm((f) => ({ ...f, contactValue: e.target.value }))}
                 className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
               />
             )}
 
-            {error && <p className="text-urgent text-sm">{error}</p>}
+            {error && <p className="text-urgent text-sm" role="alert">{error}</p>}
 
             <button
               onClick={handleSubmit}
@@ -202,11 +207,11 @@ export default function LostFoundPage() {
         )}
 
         {loading ? (
-          <p className="text-center text-ink/50 py-8">{dict.common.loading}</p>
+          <p className="text-center text-ink/60 py-8">{dict.common.loading}</p>
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-12 text-center">
-            <Search className="w-8 h-8 text-ink/30" />
-            <p className="text-ink/50">{dict.lostFound.empty}</p>
+            <Search className="w-8 h-8 text-ink/60" />
+            <p className="text-ink/60">{dict.lostFound.empty}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -222,15 +227,15 @@ export default function LostFoundPage() {
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium">{post.title}</p>
-                    <p className="text-xs text-ink/40">{categoryLabels[post.category]}</p>
+                    <p className="text-xs text-ink/60">{categoryLabels[post.category]}</p>
                   </div>
-                  <span className="text-xs text-ink/40 flex-shrink-0">
+                  <span className="text-xs text-ink/60 flex-shrink-0">
                     {new Date(post.created_at).toLocaleDateString(locale, { month: "short", day: "numeric" })}
                   </span>
                 </div>
                 {post.description && <p className="text-sm text-ink/70 mt-2">{post.description}</p>}
                 {post.location_note && (
-                  <p className="text-xs text-ink/50 flex items-center gap-1 mt-1">
+                  <p className="text-xs text-ink/60 flex items-center gap-1 mt-1">
                     <MapPin className="w-3 h-3" /> {post.location_note}
                   </p>
                 )}

@@ -111,11 +111,11 @@ export default function QiblaPage() {
       </header>
 
       <main className="max-w-md mx-auto px-5 pb-16 flex flex-col items-center">
-        {state === "loading" && <p className="text-ink/50 text-lg py-16">{dict.common.loading}</p>}
+        {state === "loading" && <p className="text-ink/60 text-lg py-16">{dict.common.loading}</p>}
 
         {state === "needs_location" && (
           <div className="flex flex-col items-center gap-4 py-12 text-center">
-            <MapPin className="w-10 h-10 text-ink/30" />
+            <MapPin className="w-10 h-10 text-ink/60" />
             <p className="text-ink/70 text-lg">{dict.qibla.locationNeeded}</p>
             <button
               onClick={requestLocation}
@@ -128,7 +128,7 @@ export default function QiblaPage() {
 
         {state === "needs_orientation_permission" && (
           <div className="flex flex-col items-center gap-4 py-12 text-center">
-            <CompassIcon className="w-10 h-10 text-ink/30" />
+            <CompassIcon className="w-10 h-10 text-ink/60" />
             <p className="text-ink/70 text-lg">{dict.qibla.instructions}</p>
             <button
               onClick={requestOrientationPermission}
@@ -141,10 +141,10 @@ export default function QiblaPage() {
 
         {state === "unsupported" && (
           <div className="flex flex-col items-center gap-3 py-16 text-center">
-            <CompassIcon className="w-10 h-10 text-ink/30" />
+            <CompassIcon className="w-10 h-10 text-ink/60" />
             <p className="text-ink/70 text-lg">{dict.qibla.notSupported}</p>
             {distanceKm != null && (
-              <p className="text-ink/50 mt-2">
+              <p className="text-ink/60 mt-2">
                 {dict.qibla.distanceToKaaba}: {distanceKm.toLocaleString()} km
               </p>
             )}
@@ -157,10 +157,10 @@ export default function QiblaPage() {
 
             <div className="relative w-72 h-72 mb-8">
               <div className="absolute inset-0 rounded-full border-4 border-sand-dark bg-white" />
-              <span className="absolute top-3 left-1/2 -translate-x-1/2 text-sm font-medium text-ink/40">N</span>
-              <span className="absolute bottom-3 left-1/2 -translate-x-1/2 text-sm font-medium text-ink/40">S</span>
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-ink/40">W</span>
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-ink/40">E</span>
+              <span className="absolute top-3 left-1/2 -translate-x-1/2 text-sm font-medium text-ink/60">N</span>
+              <span className="absolute bottom-3 left-1/2 -translate-x-1/2 text-sm font-medium text-ink/60">S</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-ink/60">W</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-ink/60">E</span>
 
               <div
                 className="absolute inset-0 flex items-start justify-center pt-6 transition-transform duration-200"
@@ -182,7 +182,7 @@ export default function QiblaPage() {
                 {dict.qibla.distanceToKaaba}: <span className="font-medium">{distanceKm.toLocaleString()} km</span>
               </p>
             )}
-            <p className="text-ink/40 text-sm text-center px-4">{dict.qibla.calibrate}</p>
+            <p className="text-ink/60 text-sm text-center px-4">{dict.qibla.calibrate}</p>
           </>
         )}
       </main>

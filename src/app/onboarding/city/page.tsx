@@ -63,7 +63,7 @@ function CitySelectionContent() {
             ))}
           </div>
         ) : cities.length === 0 ? (
-          <p className="text-center text-ink/50 py-8">{dict.onboarding.city.empty}</p>
+          <p className="text-center text-ink/60 py-8">{dict.onboarding.city.empty}</p>
         ) : (
           <div className="space-y-2">
             {cities.map((city) => (

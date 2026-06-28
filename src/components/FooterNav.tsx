@@ -33,10 +33,10 @@ export default function FooterNav() {
               aria-current={isActive ? "page" : undefined}
             >
               <Icon
-                className={`w-6 h-6 ${isActive ? "text-night-teal" : "text-ink/40"}`}
+                className={`w-6 h-6 ${isActive ? "text-night-teal" : "text-ink/60"}`}
                 strokeWidth={isActive ? 2.25 : 1.75}
               />
-              <span className={`text-xs ${isActive ? "text-night-teal font-medium" : "text-ink/50"}`}>{label}</span>
+              <span className={`text-xs ${isActive ? "text-night-teal font-medium" : "text-ink/60"}`}>{label}</span>
             </Link>
           );
         })}

@@ -40,10 +40,10 @@ export default function UpcomingEventCard() {
       <div className="flex-1 min-w-0">
         <p className="text-xs text-sage uppercase tracking-wide">{dict.home.upcomingEvent}</p>
         <p className="font-medium truncate">
-          {item.title} <span className="text-ink/40 font-normal">· {dateLabel}</span>
+          {item.title} <span className="text-ink/60 font-normal">· {dateLabel}</span>
         </p>
       </div>
-      <ChevronRight className="w-4 h-4 text-ink/30 rtl:rotate-180 flex-shrink-0" />
+      <ChevronRight className="w-4 h-4 text-ink/60 rtl:rotate-180 flex-shrink-0" />
     </Link>
   );
 }

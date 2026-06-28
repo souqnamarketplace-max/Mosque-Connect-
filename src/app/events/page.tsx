@@ -68,7 +68,7 @@ export default function EventsPage() {
             ))}
           </div>
         ) : events.length === 0 ? (
-          <p className="text-center text-ink/50 text-lg py-12">{dict.events.empty}</p>
+          <p className="text-center text-ink/60 text-lg py-12">{dict.events.empty}</p>
         ) : (
           <div className="space-y-4">
             {events.map((event) => (

@@ -33,14 +33,14 @@ export default function EmergencyBanner({ mosqueId }: { mosqueId: string }) {
           <button
             onClick={() => setDismissedIds((prev) => new Set(prev).add(n.id))}
             aria-label="Dismiss"
-            className="text-ink/40 hover:text-ink/70 text-lg leading-none"
+            className="text-ink/60 hover:text-ink/70 text-lg leading-none"
           >
             ×
           </button>
         </div>
       ))}
       {visible.length > 3 && (
-        <p className="text-xs text-ink/50">+{visible.length - 3} more</p>
+        <p className="text-xs text-ink/60">+{visible.length - 3} more</p>
       )}
     </div>
   );

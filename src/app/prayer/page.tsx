@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import PrayerCountdownWidget from "@/components/PrayerCountdownWidget";
 import FooterNav from "@/components/FooterNav";
+import { getCachedPrayerPayload, getMostRecentCachedPayload } from "@/lib/offline/prayerCache";
 
 const DEMO_MOSQUE_ID = "923dff27-c983-4c07-bf19-e94b42961d91";
 
@@ -19,9 +20,19 @@ export default function PrayerPage() {
   const [payload, setPayload] = useState<PrayerTimesPayload | null>(null);
 
   useEffect(() => {
+    const todayStr = new Date().toISOString().substring(0, 10);
     fetch(`/api/prayer-times/today?mosque_id=${DEMO_MOSQUE_ID}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then(setPayload);
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then(setPayload)
+      .catch(async () => {
+        // Same offline-cache fallback as the countdown widget on this page,
+        // so the full schedule list below it doesn't show "—" for every
+        // prayer just because the network briefly failed.
+        const cached =
+          (await getCachedPrayerPayload(DEMO_MOSQUE_ID, todayStr)) ??
+          (await getMostRecentCachedPayload(DEMO_MOSQUE_ID));
+        if (cached) setPayload(cached.payload as PrayerTimesPayload);
+      });
   }, []);
 
   const prayers: Array<{ code: string; label: string }> = [
@@ -50,11 +61,11 @@ export default function PrayerPage() {
               <span className="font-display text-lg">{p.label}</span>
               <div className="flex gap-6 text-sm">
                 <div className="text-center">
-                  <p className="text-xs text-ink/40 mb-0.5">{dict.prayerPage.adhan}</p>
+                  <p className="text-xs text-ink/60 mb-0.5">{dict.prayerPage.adhan}</p>
                   <p className="tabular-nums">{payload?.adhan[p.code]?.substring(0, 5) ?? "—"}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-ink/40 mb-0.5">{dict.prayerPage.iqama}</p>
+                  <p className="text-xs text-ink/60 mb-0.5">{dict.prayerPage.iqama}</p>
                   <p className="tabular-nums font-medium">{payload?.iqama?.[p.code]?.substring(0, 5) ?? "—"}</p>
                 </div>
               </div>

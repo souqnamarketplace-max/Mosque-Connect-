@@ -122,7 +122,7 @@ function AcceptInviteContent() {
             />
           </div>
 
-          {error && <p className="text-urgent text-sm bg-urgent/10 rounded-lg px-3 py-2">{error}</p>}
+          {error && <p className="text-urgent text-sm bg-urgent/10 rounded-lg px-3 py-2" role="alert">{error}</p>}
 
           <button
             type="submit"

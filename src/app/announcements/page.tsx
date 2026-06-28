@@ -71,7 +71,7 @@ export default function AnnouncementsPage() {
             ))}
           </div>
         ) : announcements.length === 0 ? (
-          <p className="text-center text-ink/50 text-lg py-12">{dict.announcements.empty}</p>
+          <p className="text-center text-ink/60 text-lg py-12">{dict.announcements.empty}</p>
         ) : (
           <div className="space-y-3">
             {announcements.map((a) => (
@@ -85,7 +85,7 @@ export default function AnnouncementsPage() {
                   >
                     {categoryLabels[a.category] ?? a.category}
                   </span>
-                  <span className="text-xs text-ink/40 ms-auto">
+                  <span className="text-xs text-ink/60 ms-auto">
                     {new Date(a.publish_at).toLocaleDateString(locale, { month: "short", day: "numeric" })}
                   </span>
                 </div>
@@ -96,19 +96,19 @@ export default function AnnouncementsPage() {
                   <div className="bg-sand-dark/30 rounded-xl p-3 mt-2 space-y-1 text-sm">
                     {a.deceased_name && (
                       <p>
-                        <span className="text-ink/50">{dict.announcements.funeralDetails.deceasedName}:</span>{" "}
+                        <span className="text-ink/60">{dict.announcements.funeralDetails.deceasedName}:</span>{" "}
                         <span className="font-medium">{a.deceased_name}</span>
                       </p>
                     )}
                     {a.burial_time && (
                       <p>
-                        <span className="text-ink/50">{dict.announcements.funeralDetails.burialTime}:</span>{" "}
+                        <span className="text-ink/60">{dict.announcements.funeralDetails.burialTime}:</span>{" "}
                         {new Date(a.burial_time).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })}
                       </p>
                     )}
                     {a.burial_location && (
                       <p>
-                        <span className="text-ink/50">{dict.announcements.funeralDetails.burialLocation}:</span>{" "}
+                        <span className="text-ink/60">{dict.announcements.funeralDetails.burialLocation}:</span>{" "}
                         {a.burial_location}
                       </p>
                     )}
@@ -119,19 +119,19 @@ export default function AnnouncementsPage() {
                   <div className="bg-gold/10 rounded-xl p-3 mt-2 space-y-1 text-sm">
                     {a.couple_names && (
                       <p>
-                        <span className="text-ink/50">{dict.announcements.nikahDetails.coupleNames}:</span>{" "}
+                        <span className="text-ink/60">{dict.announcements.nikahDetails.coupleNames}:</span>{" "}
                         <span className="font-medium">{a.couple_names}</span>
                       </p>
                     )}
                     {a.ceremony_time && (
                       <p>
-                        <span className="text-ink/50">{dict.announcements.nikahDetails.ceremonyTime}:</span>{" "}
+                        <span className="text-ink/60">{dict.announcements.nikahDetails.ceremonyTime}:</span>{" "}
                         {new Date(a.ceremony_time).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })}
                       </p>
                     )}
                     {a.ceremony_location && (
                       <p>
-                        <span className="text-ink/50">{dict.announcements.nikahDetails.ceremonyLocation}:</span>{" "}
+                        <span className="text-ink/60">{dict.announcements.nikahDetails.ceremonyLocation}:</span>{" "}
                         {a.ceremony_location}
                       </p>
                     )}

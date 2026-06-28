@@ -9,8 +9,17 @@ import { calculatePrayerTimes, toTimeString } from "@/lib/prayerCalculation";
  * existed. Skips any date where is_manual_override = true, per spec 2.2.
  */
 export async function GET(request: NextRequest) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    // Fail closed: if the secret was never configured, refuse every request
+    // rather than silently comparing against the literal string "undefined"
+    // (which an attacker could trivially send as the header value).
+    console.error("CRON_SECRET is not set — refusing all requests to this endpoint.");
+    return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
+  }
+
   const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

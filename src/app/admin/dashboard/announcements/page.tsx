@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Plus, Trash2, Pin, X } from "lucide-react";
+import { Plus, Trash2, Pin, X, Filter } from "lucide-react";
 import { useAdminSession } from "@/lib/hooks/useAdminSession";
 import AdminDashboardShell from "@/components/admin/AdminDashboardShell";
+import PaginationControls from "@/components/admin/PaginationControls";
 
 interface Announcement {
   id: string;
@@ -34,6 +35,12 @@ export default function AnnouncementsAdminPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+
   const [form, setForm] = useState({
     category: "general" as (typeof CATEGORIES)[number],
     title: "",
@@ -50,10 +57,19 @@ export default function AnnouncementsAdminPage() {
   const load = useCallback(async () => {
     if (!selectedMosqueId) return;
     setLoading(true);
-    const res = await fetch(`/api/admin/announcements?mosque_id=${selectedMosqueId}`);
-    setItems(res.ok ? await res.json() : []);
+    const params = new URLSearchParams({ mosque_id: selectedMosqueId, page: String(page), pageSize: "20" });
+    if (categoryFilter) params.set("category", categoryFilter);
+    const res = await fetch(`/api/admin/announcements?${params}`);
+    if (res.ok) {
+      const data = await res.json();
+      setItems(data.items);
+      setTotalPages(data.totalPages);
+      setTotalCount(data.totalCount);
+    } else {
+      setItems([]);
+    }
     setLoading(false);
-  }, [selectedMosqueId]);
+  }, [selectedMosqueId, page, categoryFilter]);
 
   useEffect(() => {
     if (ready) load();
@@ -100,7 +116,7 @@ export default function AnnouncementsAdminPage() {
   };
 
   if (!ready) {
-    return <div className="min-h-screen flex items-center justify-center text-ink/50">Checking access…</div>;
+    return <div className="min-h-screen flex items-center justify-center text-ink/60">Checking access…</div>;
   }
 
   return (
@@ -113,14 +129,46 @@ export default function AnnouncementsAdminPage() {
     >
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display text-lg">Announcements</h2>
-        <button
-          onClick={() => setShowForm((s) => !s)}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-night-teal text-sand text-sm font-medium"
-        >
-          {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-          {showForm ? "Cancel" : "New"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowFilters((s) => !s)}
+            aria-label={showFilters ? "Hide filters" : "Show filters"}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium ${
+              categoryFilter ? "bg-night-teal text-sand" : "bg-white text-ink/70 border border-sand-dark"
+            }`}
+          >
+            <Filter className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setShowForm((s) => !s)}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-night-teal text-sand text-sm font-medium"
+          >
+            {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            {showForm ? "Cancel" : "New"}
+          </button>
+        </div>
       </div>
+
+      {showFilters && (
+        <div className="bg-white rounded-2xl p-3 mb-4">
+          <select
+            value={categoryFilter}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setPage(1);
+            }}
+            aria-label="Filter by category"
+            className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5 text-sm"
+          >
+            <option value="">All categories</option>
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c.replace("_", " ")}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {showForm && (
         <div className="bg-white rounded-2xl p-4 mb-5 space-y-3">
@@ -138,12 +186,14 @@ export default function AnnouncementsAdminPage() {
           <input
             type="text"
             placeholder="Title"
+              aria-label="Title"
             value={form.title}
             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
             className="w-full bg-sand-dark/30 rounded-lg px-3 py-2.5"
           />
           <textarea
             placeholder="Body (optional)"
+              aria-label="Body (optional)"
             value={form.body}
             onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))}
             rows={3}
@@ -155,6 +205,7 @@ export default function AnnouncementsAdminPage() {
               <input
                 type="text"
                 placeholder="Name of the deceased"
+              aria-label="Name of the deceased"
                 value={form.deceasedName}
                 onChange={(e) => setForm((f) => ({ ...f, deceasedName: e.target.value }))}
                 className="w-full bg-white rounded-lg px-3 py-2"
@@ -168,6 +219,7 @@ export default function AnnouncementsAdminPage() {
               <input
                 type="text"
                 placeholder="Burial location"
+              aria-label="Burial location"
                 value={form.burialLocation}
                 onChange={(e) => setForm((f) => ({ ...f, burialLocation: e.target.value }))}
                 className="w-full bg-white rounded-lg px-3 py-2"
@@ -180,6 +232,7 @@ export default function AnnouncementsAdminPage() {
               <input
                 type="text"
                 placeholder="Names of the couple"
+              aria-label="Names of the couple"
                 value={form.coupleNames}
                 onChange={(e) => setForm((f) => ({ ...f, coupleNames: e.target.value }))}
                 className="w-full bg-white rounded-lg px-3 py-2"
@@ -193,6 +246,7 @@ export default function AnnouncementsAdminPage() {
               <input
                 type="text"
                 placeholder="Ceremony location"
+              aria-label="Ceremony location"
                 value={form.ceremonyLocation}
                 onChange={(e) => setForm((f) => ({ ...f, ceremonyLocation: e.target.value }))}
                 className="w-full bg-white rounded-lg px-3 py-2"
@@ -207,7 +261,7 @@ export default function AnnouncementsAdminPage() {
             />
             Pin to top
           </label>
-          {error && <p className="text-urgent text-sm">{error}</p>}
+          {error && <p className="text-urgent text-sm" role="alert">{error}</p>}
           <button
             onClick={handleCreate}
             disabled={saving}
@@ -219,27 +273,32 @@ export default function AnnouncementsAdminPage() {
       )}
 
       {loading ? (
-        <p className="text-center text-ink/50 py-8">Loading…</p>
+        <p className="text-center text-ink/60 py-8">Loading…</p>
       ) : items.length === 0 ? (
-        <p className="text-center text-ink/50 py-8">No announcements yet.</p>
+        <p className="text-center text-ink/60 py-8">
+          {categoryFilter ? "No announcements match this filter." : "No announcements yet."}
+        </p>
       ) : (
-        <div className="space-y-2">
-          {items.map((item) => (
-            <div key={item.id} className="bg-white rounded-xl p-4 flex items-start gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  {item.is_pinned && <Pin className="w-3.5 h-3.5 text-gold" />}
-                  <span className="text-xs text-ink/50">{item.category.replace("_", " ")}</span>
+        <>
+          <div className="space-y-2">
+            {items.map((item) => (
+              <div key={item.id} className="bg-white rounded-xl p-4 flex items-start gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    {item.is_pinned && <Pin className="w-3.5 h-3.5 text-gold" />}
+                    <span className="text-xs text-ink/60">{item.category.replace("_", " ")}</span>
+                  </div>
+                  <p className="font-medium">{item.title}</p>
+                  {item.body && <p className="text-sm text-ink/60 line-clamp-2 mt-0.5">{item.body}</p>}
                 </div>
-                <p className="font-medium">{item.title}</p>
-                {item.body && <p className="text-sm text-ink/60 line-clamp-2 mt-0.5">{item.body}</p>}
+                <button onClick={() => handleDelete(item.id)} className="text-ink/60 hover:text-urgent p-2">
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
-              <button onClick={() => handleDelete(item.id)} className="text-ink/30 hover:text-urgent p-1">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <PaginationControls page={page} totalPages={totalPages} totalCount={totalCount} onPageChange={setPage} />
+        </>
       )}
     </AdminDashboardShell>
   );

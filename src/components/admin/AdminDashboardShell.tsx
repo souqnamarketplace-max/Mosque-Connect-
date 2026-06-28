@@ -11,9 +11,13 @@ const TABS = [
   { href: "/admin/dashboard/ramadan", label: "Ramadan" },
   { href: "/admin/dashboard/announcements", label: "Announcements" },
   { href: "/admin/dashboard/events", label: "Events" },
+  { href: "/admin/dashboard/classes", label: "Classes" },
+  { href: "/admin/dashboard/volunteer", label: "Volunteer" },
   { href: "/admin/dashboard/donations", label: "Donations" },
   { href: "/admin/dashboard/livestream", label: "Live Stream" },
+  { href: "/admin/dashboard/directory", label: "Directory" },
   { href: "/admin/dashboard/profile", label: "Mosque Profile" },
+  { href: "/admin/dashboard/analytics", label: "Analytics" },
   { href: "/admin/dashboard/audit-logs", label: "Audit Logs" },
 ];
 

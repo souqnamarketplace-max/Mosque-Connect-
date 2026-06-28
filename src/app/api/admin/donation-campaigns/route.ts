@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getAdminContext, canManageMosque } from "@/lib/adminAuth";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { logAdminAction } from "@/lib/adminAudit";
+import { parsePagination, rangeFor, buildPaginatedResponse } from "@/lib/pagination";
 
 const createSchema = z.object({
   mosqueId: z.string().uuid(),
@@ -22,16 +23,19 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const status = searchParams.get("status"); // "active" | "inactive"
+  const pagination = parsePagination(searchParams);
+  const [from, to] = rangeFor(pagination);
+
   const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("donation_campaigns")
-    .select("*")
-    .eq("mosque_id", mosqueId)
-    .order("created_at", { ascending: false })
-    .limit(50);
+  let query = supabase.from("donation_campaigns").select("*", { count: "exact" }).eq("mosque_id", mosqueId);
+  if (status === "active") query = query.eq("is_active", true);
+  if (status === "inactive") query = query.eq("is_active", false);
+
+  const { data, error, count } = await query.order("created_at", { ascending: false }).range(from, to);
 
   if (error) return NextResponse.json({ error: "Failed to load campaigns" }, { status: 500 });
-  return NextResponse.json(data);
+  return NextResponse.json(buildPaginatedResponse(data ?? [], count ?? 0, pagination));
 }
 
 export async function POST(request: NextRequest) {

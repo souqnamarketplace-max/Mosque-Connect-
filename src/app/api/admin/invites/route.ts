@@ -3,6 +3,8 @@ import { z } from "zod";
 import { getAdminContext } from "@/lib/adminAuth";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { logAdminAction } from "@/lib/adminAudit";
+import { parsePagination, rangeFor, buildPaginatedResponse } from "@/lib/pagination";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 const createSchema = z.object({
   email: z.string().email(),
@@ -10,27 +12,41 @@ const createSchema = z.object({
   role: z.enum(["owner", "admin", "editor"]).default("admin"),
 });
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const ctx = await getAdminContext();
   if (!ctx?.isPlatformAdmin) {
     return NextResponse.json({ error: "Only platform admins can view invites" }, { status: 403 });
   }
 
+  const { searchParams } = new URL(request.url);
+  const status = searchParams.get("status"); // "pending" | "accepted" | "revoked" | "expired"
+  const pagination = parsePagination(searchParams);
+  const [from, to] = rangeFor(pagination);
+
   const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("mosque_admin_invites")
-    .select("id, email, mosque_ids, role, status, created_at, expires_at, accepted_at")
-    .order("created_at", { ascending: false })
-    .limit(100);
+    .select("id, email, mosque_ids, role, status, created_at, expires_at, accepted_at", { count: "exact" });
+  if (status) query = query.eq("status", status);
+
+  const { data, error, count } = await query.order("created_at", { ascending: false }).range(from, to);
 
   if (error) return NextResponse.json({ error: "Failed to load invites" }, { status: 500 });
-  return NextResponse.json(data);
+  return NextResponse.json(buildPaginatedResponse(data ?? [], count ?? 0, pagination));
 }
 
 export async function POST(request: NextRequest) {
   const ctx = await getAdminContext();
   if (!ctx?.isPlatformAdmin) {
     return NextResponse.json({ error: "Only platform admins can create invites" }, { status: 403 });
+  }
+
+  const rateLimit = await checkRateLimit("mosqueAdminInviteCreate", request, ctx.userId);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many invites created. Please wait a few minutes before trying again." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil((rateLimit.reset - Date.now()) / 1000)) } }
+    );
   }
 
   const body = await request.json();

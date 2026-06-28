@@ -36,7 +36,7 @@ export default function LatestAnnouncementCard() {
         <p className="text-xs text-sage uppercase tracking-wide">{dict.home.latestAnnouncement}</p>
         <p className="font-medium truncate">{item.title}</p>
       </div>
-      <ChevronRight className="w-4 h-4 text-ink/30 rtl:rotate-180 flex-shrink-0" />
+      <ChevronRight className="w-4 h-4 text-ink/60 rtl:rotate-180 flex-shrink-0" />
     </Link>
   );
 }

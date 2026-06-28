@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAdminContext, canManageMosque } from "@/lib/adminAuth";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/serviceRole";
+import { parsePagination, rangeFor, buildPaginatedResponse } from "@/lib/pagination";
 
 export async function GET(request: NextRequest) {
   const ctx = await getAdminContext();
@@ -13,13 +14,24 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const action = searchParams.get("action"); // e.g. "announcement.create"
+  const dateFrom = searchParams.get("date_from"); // ISO date, e.g. 2026-06-01
+  const dateTo = searchParams.get("date_to");
+
+  const pagination = parsePagination(searchParams);
+  const [from, to] = rangeFor(pagination);
+
   const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("admin_audit_logs")
-    .select("id, actor_user_id, action, resource_type, resource_id, details, created_at")
-    .eq("mosque_id", mosqueId)
-    .order("created_at", { ascending: false })
-    .limit(100);
+    .select("id, actor_user_id, action, resource_type, resource_id, details, created_at", { count: "exact" })
+    .eq("mosque_id", mosqueId);
+
+  if (action) query = query.eq("action", action);
+  if (dateFrom) query = query.gte("created_at", dateFrom);
+  if (dateTo) query = query.lte("created_at", `${dateTo}T23:59:59.999Z`);
+
+  const { data, error, count } = await query.order("created_at", { ascending: false }).range(from, to);
 
   if (error) return NextResponse.json({ error: "Failed to load audit logs" }, { status: 500 });
 
@@ -45,5 +57,5 @@ export async function GET(request: NextRequest) {
     actor_email: row.actor_user_id ? emailById[row.actor_user_id] ?? "Unknown" : "System",
   }));
 
-  return NextResponse.json(enriched);
+  return NextResponse.json(buildPaginatedResponse(enriched, count ?? 0, pagination));
 }

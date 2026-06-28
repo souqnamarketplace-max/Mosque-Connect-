@@ -66,7 +66,7 @@ export default function ProvinceSelectionPage() {
                   <MapPin className="w-4 h-4 text-sage" />
                   {localizedName(province)}
                 </span>
-                <span className="text-ink/40 text-sm">{province.code}</span>
+                <span className="text-ink/60 text-sm">{province.code}</span>
               </button>
             ))}
           </div>

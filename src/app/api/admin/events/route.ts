@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getAdminContext, canManageMosque } from "@/lib/adminAuth";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { logAdminAction } from "@/lib/adminAudit";
+import { parsePagination, rangeFor, buildPaginatedResponse } from "@/lib/pagination";
 
 const createSchema = z.object({
   mosqueId: z.string().uuid(),
@@ -27,16 +28,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const category = searchParams.get("category");
+  const pagination = parsePagination(searchParams);
+  const [from, to] = rangeFor(pagination);
+
   const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("events")
-    .select("*")
-    .eq("mosque_id", mosqueId)
-    .order("event_date", { ascending: false })
-    .limit(50);
+  let query = supabase.from("events").select("*", { count: "exact" }).eq("mosque_id", mosqueId);
+  if (category) query = query.eq("category", category);
+
+  const { data, error, count } = await query.order("event_date", { ascending: false }).range(from, to);
 
   if (error) return NextResponse.json({ error: "Failed to load events" }, { status: 500 });
-  return NextResponse.json(data);
+  return NextResponse.json(buildPaginatedResponse(data ?? [], count ?? 0, pagination));
 }
 
 export async function POST(request: NextRequest) {

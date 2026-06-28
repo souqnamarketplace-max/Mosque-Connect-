@@ -35,13 +35,13 @@ export default function MosqueProfilePage() {
   }, []);
 
   if (loading) {
-    return <div className="min-h-screen bg-sand p-6 text-center text-ink/50 text-lg">{dict.common.loading}</div>;
+    return <div className="min-h-screen bg-sand p-6 text-center text-ink/60 text-lg">{dict.common.loading}</div>;
   }
 
   if (!mosque) {
     return (
       <div className="min-h-screen bg-sand flex items-center justify-center p-6">
-        <p className="text-ink/50 text-lg text-center">{dict.common.notSet}</p>
+        <p className="text-ink/60 text-lg text-center">{dict.common.notSet}</p>
       </div>
     );
   }
@@ -153,7 +153,7 @@ function InfoRow({
     <div className="flex items-start gap-3 p-4">
       <Icon className="w-5 h-5 text-night-teal flex-shrink-0 mt-0.5" />
       <div className="flex-1">
-        <p className="text-sm text-ink/50">{label}</p>
+        <p className="text-sm text-ink/60">{label}</p>
         {isLink ? (
           <a
             href={value.startsWith("http") ? value : `https://${value}`}
