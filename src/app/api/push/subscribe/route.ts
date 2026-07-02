@@ -1,56 +1,72 @@
-import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getAuthenticatedUserId } from "@/lib/userAuth";
+/**
+ * POST /api/push/subscribe
+ * Saves a Web Push subscription for the current user.
+ * Called by the client after the browser grants push permission.
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 
-const subscribeSchema = z.object({
-  endpoint: z.string().url(),
-  keys: z.object({
-    p256dh: z.string(),
-    auth: z.string(),
-  }),
-});
+export async function POST(req: NextRequest) {
+  try {
+    const supabase = await createClient();
 
-export async function POST(request: NextRequest) {
-  const userId = await getAuthenticatedUserId();
-  if (!userId) {
-    return NextResponse.json({ error: "No session. Call /api/auth/ensure-session first." }, { status: 401 });
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { endpoint, p256dh, auth_key, platform } = await req.json();
+
+    if (!endpoint || !p256dh || !auth_key) {
+      return NextResponse.json({ error: 'Missing subscription fields' }, { status: 400 });
+    }
+
+    // Upsert — one subscription per endpoint per user
+    const { error } = await supabase
+      .from('push_subscriptions')
+      .upsert(
+        {
+          user_id:     user.id,
+          endpoint,
+          p256dh,
+          auth_key,
+          platform:    platform ?? 'web',
+          last_used_at: new Date().toISOString(),
+        },
+        { onConflict: 'endpoint' }
+      );
+
+    if (error) throw error;
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('[push/subscribe] error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const parsed = subscribeSchema.safeParse(await request.json());
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid subscription payload" }, { status: 400 });
-  }
-
-  const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.from("push_subscriptions").upsert(
-    {
-      user_id: userId,
-      platform: "web_push",
-      endpoint: parsed.data.endpoint,
-      p256dh: parsed.data.keys.p256dh,
-      auth_key: parsed.data.keys.auth,
-      last_used_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id,endpoint" }
-  );
-
-  if (error) {
-    return NextResponse.json({ error: "Failed to save subscription" }, { status: 500 });
-  }
-  return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(request: NextRequest) {
-  const userId = await getAuthenticatedUserId();
-  if (!userId) {
-    return NextResponse.json({ error: "No session." }, { status: 401 });
+// Unsubscribe — delete by endpoint
+export async function DELETE(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { endpoint } = await req.json();
+    if (!endpoint) return NextResponse.json({ error: 'endpoint required' }, { status: 400 });
+
+    await supabase
+      .from('push_subscriptions')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('endpoint', endpoint);
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('[push/subscribe] DELETE error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const { endpoint } = await request.json();
-  if (!endpoint) return NextResponse.json({ error: "endpoint is required" }, { status: 400 });
-
-  const supabase = await createServerSupabaseClient();
-  await supabase.from("push_subscriptions").delete().eq("user_id", userId).eq("endpoint", endpoint);
-  return NextResponse.json({ ok: true });
 }
