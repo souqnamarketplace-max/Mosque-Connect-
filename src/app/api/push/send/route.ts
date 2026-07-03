@@ -14,7 +14,7 @@
  * }
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 import { sendWebPushToUsers } from '@/lib/push/web-push-sender';
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
                    && cron_secret !== 'PLACEHOLDER_CRON_SECRET';
 
     if (!isCron) {
-      const supabase = await createClient();
+      const supabase = await createServerSupabaseClient();
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError || !user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
