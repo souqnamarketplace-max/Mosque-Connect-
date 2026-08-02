@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Globe, MapPin, Bell, Moon, Sun, Monitor, ShieldCheck, Users } from "lucide-react";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import FooterNav from "@/components/FooterNav";
+import PreferencesSection from "@/components/profile/PreferencesSection";
 
 interface CurrentSettings {
   language: "en" | "ar" | "ur" | null;
@@ -18,10 +19,11 @@ const LANGUAGE_LABELS: Record<string, string> = { en: "English", ar: "العرب
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { dict, language } = useI18n();
+  const { dict, language, setLanguage } = useI18n();
   const [settings, setSettings] = useState<CurrentSettings | null>(null);
   const [theme, setThemeState] = useState<"light" | "dark" | "system">("system");
   const [loading, setLoading] = useState(true);
+  const [showPreferences, setShowPreferences] = useState(false);
 
   const localizedCity = settings?.city
     ? language === "ar"
@@ -79,19 +81,19 @@ export default function SettingsPage() {
               icon={MapPin}
               label={dict.settings.mosque}
               value={loading ? "…" : settings?.mosque?.name ?? dict.common.notSet}
-              href="/onboarding/province"
+              onClick={() => setShowPreferences((v) => !v)}
             />
             <SettingsRow
               icon={MapPin}
               label={dict.settings.city}
               value={loading ? "…" : localizedCity ?? dict.common.notSet}
-              href="/onboarding/province"
+              onClick={() => setShowPreferences((v) => !v)}
             />
             <SettingsRow
               icon={MapPin}
               label={dict.settings.province}
               value={loading ? "…" : localizedProvince ?? dict.common.notSet}
-              href="/onboarding/province"
+              onClick={() => setShowPreferences((v) => !v)}
             />
           </div>
         </div>
@@ -103,11 +105,26 @@ export default function SettingsPage() {
             <SettingsRow
               icon={Globe}
               label={dict.settings.appLanguage}
-              value={loading ? "…" : LANGUAGE_LABELS[settings?.language ?? "en"]}
-              href="/onboarding/language"
+              value={LANGUAGE_LABELS[language]}
+              onClick={() => setShowPreferences((v) => !v)}
             />
           </div>
         </div>
+
+        {/* Inline mosque + language editor */}
+        {showPreferences && (
+          <div className="bg-card rounded-2xl overflow-hidden">
+            <PreferencesSection
+              currentLang={language}
+              currentMosqueId={settings?.mosque?.id ?? null}
+              onLanguageChange={setLanguage}
+              onMosqueChange={(id, name) => {
+                setSettings((prev) => (prev ? { ...prev, mosque: { id, name } } : prev));
+                setShowPreferences(false);
+              }}
+            />
+          </div>
+        )}
 
         {/* Notifications */}
         <div>
@@ -164,18 +181,34 @@ function SettingsRow({
   label,
   value,
   href,
+  onClick,
 }: {
   icon: typeof Globe;
   label: string;
   value?: string;
-  href: string;
+  href?: string;
+  onClick?: () => void;
 }) {
-  return (
-    <Link href={href} className="flex items-center gap-3 p-4 hover:bg-sand-dark/30 transition-colors">
+  const content = (
+    <>
       <Icon className="w-4 h-4 text-night-teal flex-shrink-0" />
       <span className="flex-1">{label}</span>
       {value && <span className="text-sm text-ink/60">{value}</span>}
       <ChevronRight className="w-4 h-4 text-ink/60 rtl:rotate-180" />
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button onClick={onClick} className="w-full flex items-center gap-3 p-4 text-left hover:bg-sand-dark/30 transition-colors">
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link href={href!} className="flex items-center gap-3 p-4 hover:bg-sand-dark/30 transition-colors">
+      {content}
     </Link>
   );
 }

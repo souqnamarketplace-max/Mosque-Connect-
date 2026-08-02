@@ -4,13 +4,15 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import BottomNav from '@/components/BottomNav';
 import MosqueHeroIllustration from '@/components/MosqueHeroIllustration';
+import DeviceInitializer from '@/components/DeviceInitializer';
+import EmergencyBanner from '@/components/EmergencyBanner';
 
 interface PrayerTimes {
   fajr: string; dhuhr: string; asr: string; maghrib: string; isha: string;
   sunrise?: string; sunset?: string;
 }
 interface HomeData {
-  mosqueName: string; city: string; hijriDate: string;
+  mosqueId: string | null; mosqueName: string | null; city: string | null; hijriDate: string;
   weather?: { temp: number; condition: string };
   announcement?: { title: string; body: string; url?: string };
 }
@@ -68,6 +70,13 @@ export default function HomePage() {
 
   return (
     <main className="home">
+      <DeviceInitializer />
+
+      {home?.mosqueId && (
+        <div className="mx-4 mt-3">
+          <EmergencyBanner mosqueId={home.mosqueId} />
+        </div>
+      )}
 
       {/* ── Hero ── */}
       <header className="hero">

@@ -10,14 +10,8 @@ import { parsePagination, rangeFor, buildPaginatedResponse } from "@/lib/paginat
 const createSchema = z.object({
   mosqueId: z.string().uuid(),
   title: z.string().min(1).max(200),
-  description: z.string().max(2000).optional(),
-  category: z.enum(["friday_program", "youth_program", "ramadan_program", "community", "other"]),
-  eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  startTime: z.string().optional().or(z.literal("")),
-  endTime: z.string().optional().or(z.literal("")),
-  location: z.string().max(300).optional(),
-  speaker: z.string().max(200).optional(),
-  registrationUrl: z.string().url().optional().or(z.literal("")),
+  message: z.string().min(1).max(1000),
+  expiresAt: z.string().datetime().optional().or(z.literal("")),
 });
 
 export async function GET(request: NextRequest) {
@@ -30,17 +24,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const category = searchParams.get("category");
   const pagination = parsePagination(searchParams);
   const [from, to] = rangeFor(pagination);
 
   const supabase = await createServerSupabaseClient();
-  let query = supabase.from("events").select("*", { count: "exact" }).eq("mosque_id", mosqueId);
-  if (category) query = query.eq("category", category);
+  const { data, error, count } = await supabase
+    .from("emergency_notifications")
+    .select("*", { count: "exact" })
+    .eq("mosque_id", mosqueId)
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
-  const { data, error, count } = await query.order("event_date", { ascending: false }).range(from, to);
-
-  if (error) return NextResponse.json({ error: "Failed to load events" }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Failed to load emergency notifications" }, { status: 500 });
   return NextResponse.json(buildPaginatedResponse(data ?? [], count ?? 0, pagination));
 }
 
@@ -59,37 +54,31 @@ export async function POST(request: NextRequest) {
 
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
-    .from("events")
+    .from("emergency_notifications")
     .insert({
       mosque_id: parsed.data.mosqueId,
       title: parsed.data.title,
-      description: parsed.data.description || null,
-      category: parsed.data.category,
-      event_date: parsed.data.eventDate,
-      start_time: parsed.data.startTime || null,
-      end_time: parsed.data.endTime || null,
-      location: parsed.data.location || null,
-      speaker: parsed.data.speaker || null,
-      registration_url: parsed.data.registrationUrl || null,
-      created_by: ctx.userId,
+      message: parsed.data.message,
+      expires_at: parsed.data.expiresAt || null,
+      is_active: true,
     })
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: "Failed to create event" }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Failed to create emergency notification" }, { status: 500 });
 
   await logAdminAction({
     actorUserId: ctx.userId,
     mosqueId: parsed.data.mosqueId,
-    action: "event.create",
-    resourceType: "event",
+    action: "emergency_notification.create",
+    resourceType: "emergency_notification",
     resourceId: data.id,
-    details: { title: data.title, eventDate: data.event_date },
+    details: { title: data.title },
   });
 
-  // Fan out a smart notification to everyone following this mosque, same
-  // as new announcements — an event is exactly the kind of update people
-  // opt in to be notified about (notify_new_events preference).
+  // Emergency push bypasses quiet hours and per-category opt-outs (see
+  // sendSmartNotification) — this is the one category that's never
+  // silently suppressed, by design.
   const serviceClient = createServiceRoleClient();
   const { data: subscribers } = await serviceClient
     .from("user_mosque_subscriptions")
@@ -97,43 +86,52 @@ export async function POST(request: NextRequest) {
     .eq("mosque_id", parsed.data.mosqueId);
 
   for (const sub of subscribers ?? []) {
-    // Not awaited in sequence — see announcements route for rationale.
     sendSmartNotification({
       userId: sub.user_id,
       mosqueId: parsed.data.mosqueId,
-      category: "new_event",
+      category: "emergency",
       title: data.title,
-      body: data.description ?? "",
-      url: "/events",
+      body: data.message,
+      url: "/",
     }).catch(() => {});
   }
 
   return NextResponse.json(data);
 }
 
-export async function DELETE(request: NextRequest) {
+export async function PATCH(request: NextRequest) {
   const ctx = await getAdminContext();
   if (!ctx) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
+  const body = await request.json();
+  const schema = z.object({ id: z.string().uuid(), isActive: z.boolean() });
+  const parsed = schema.safeParse(body);
+  if (!parsed.success) return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
 
   const supabase = await createServerSupabaseClient();
-  const { data: existing } = await supabase.from("events").select("mosque_id").eq("id", id).single();
+  const { data: existing } = await supabase
+    .from("emergency_notifications")
+    .select("mosque_id")
+    .eq("id", parsed.data.id)
+    .single();
   if (!existing || !canManageMosque(ctx, existing.mosque_id)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { error } = await supabase.from("events").delete().eq("id", id);
-  if (error) return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
+  const { error } = await supabase
+    .from("emergency_notifications")
+    .update({ is_active: parsed.data.isActive })
+    .eq("id", parsed.data.id);
+
+  if (error) return NextResponse.json({ error: "Failed to update" }, { status: 500 });
 
   await logAdminAction({
     actorUserId: ctx.userId,
     mosqueId: existing.mosque_id,
-    action: "event.delete",
-    resourceType: "event",
-    resourceId: id,
+    action: "emergency_notification.toggle_active",
+    resourceType: "emergency_notification",
+    resourceId: parsed.data.id,
+    details: { isActive: parsed.data.isActive },
   });
 
   return NextResponse.json({ ok: true });
