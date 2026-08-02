@@ -46,6 +46,7 @@ const en = {
     greetingMorning: "Good morning",
     greetingAfternoon: "Good afternoon",
     greetingEvening: "Good evening",
+    greeting: "Assalamu Alaikum",
     weather: {
       conditions: {
         clearSky: "Clear Sky",
@@ -254,6 +255,14 @@ const en = {
   qiblaStrip: {
     direction: "Qibla Direction",
     distance: "Qibla Distance",
+  },
+  duas: {
+    title: "Daily Dua",
+    transliteration: "Transliteration",
+    source: "Source",
+    categories: "Categories",
+    empty: "No dua content available right now.",
+    back: "Back",
   },
   community: {
     title: "Community",

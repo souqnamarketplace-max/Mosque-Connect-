@@ -48,6 +48,7 @@ const ur: TranslationDict = {
     greetingMorning: "صبح بخیر",
     greetingAfternoon: "دن بخیر",
     greetingEvening: "شام بخیر",
+    greeting: "السلام علیکم",
     weather: {
       conditions: {
         clearSky: "صاف آسمان",
@@ -256,6 +257,14 @@ const ur: TranslationDict = {
   qiblaStrip: {
     direction: "قبلہ کی سمت",
     distance: "قبلہ کا فاصلہ",
+  },
+  duas: {
+    title: "روزانہ دعا",
+    transliteration: "تلفظ",
+    source: "ماخذ",
+    categories: "زمرہ جات",
+    empty: "اس وقت کوئی دعا دستیاب نہیں ہے۔",
+    back: "واپس",
   },
   community: {
     title: "کمیونٹی",

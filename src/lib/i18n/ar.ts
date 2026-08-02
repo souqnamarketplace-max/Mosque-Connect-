@@ -48,6 +48,7 @@ const ar: TranslationDict = {
     greetingMorning: "صباح الخير",
     greetingAfternoon: "مساء الخير",
     greetingEvening: "مساء الخير",
+    greeting: "السلام عليكم",
     weather: {
       conditions: {
         clearSky: "سماء صافية",
@@ -256,6 +257,14 @@ const ar: TranslationDict = {
   qiblaStrip: {
     direction: "اتجاه القبلة",
     distance: "مسافة القبلة",
+  },
+  duas: {
+    title: "دعاء اليوم",
+    transliteration: "النقحرة",
+    source: "المصدر",
+    categories: "الفئات",
+    empty: "لا يوجد محتوى دعاء متاح حاليًا.",
+    back: "رجوع",
   },
   community: {
     title: "المجتمع",
