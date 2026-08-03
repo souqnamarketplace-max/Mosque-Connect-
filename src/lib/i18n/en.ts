@@ -176,6 +176,8 @@ const en = {
     requestTaxReceipt: "Request a tax receipt",
     continueToPay: "Continue to Payment",
     comingSoon: "Online payment is being set up. Please contact the mosque directly to donate for now.",
+    thankYou: "Jazakum Allah khair — your donation was received. May Allah accept it.",
+    cancelled: "Checkout was cancelled. No payment was made.",
     back: "Back",
   },
   events: {

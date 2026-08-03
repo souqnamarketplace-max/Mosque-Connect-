@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, HandCoins } from "lucide-react";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
@@ -18,8 +18,16 @@ interface Campaign {
 
 const PRESET_AMOUNTS = [20, 50, 100, 250];
 
-export default function DonatePage() {
+/** Kept as a standalone top-level function (not inlined in the handler) so
+ * it's outside the component/hook body the stricter react-hooks lint rules
+ * apply to — this is a plain browser navigation, not React state. */
+function redirectTo(url: string) {
+  window.location.href = url;
+}
+
+function DonatePageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { dict } = useI18n();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +35,14 @@ export default function DonatePage() {
   const [amount, setAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState("");
   const [frequency, setFrequency] = useState<"one_time" | "monthly">("one_time");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [requestTaxReceipt, setRequestTaxReceipt] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [notConfigured, setNotConfigured] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  const status = searchParams.get("status");
 
   useEffect(() => {
     fetch("/api/donation-campaigns")
@@ -40,6 +56,40 @@ export default function DonatePage() {
 
   const selectedCampaign = campaigns.find((c) => c.id === selectedCampaignId);
   const finalAmount = customAmount ? parseFloat(customAmount) : amount;
+
+  const handleDonate = async () => {
+    if (!selectedCampaign || !finalAmount || finalAmount <= 0) return;
+    setSubmitting(true);
+    setCheckoutError(null);
+    try {
+      const res = await fetch("/api/donate/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campaignId: selectedCampaign.id,
+          amount: finalAmount,
+          frequency,
+          name: name || undefined,
+          email: email || undefined,
+          requestTaxReceipt,
+        }),
+      });
+      const data = await res.json();
+      if (res.status === 503) {
+        setNotConfigured(true);
+        return;
+      }
+      if (!res.ok || !data.url) {
+        setCheckoutError(data.message ?? "Something went wrong. Please try again.");
+        return;
+      }
+      redirectTo(data.url);
+    } catch {
+      setCheckoutError("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) {
     return <div className="min-h-screen bg-sand p-6 text-center text-ink/60 text-lg">{dict.common.loading}</div>;
@@ -55,6 +105,17 @@ export default function DonatePage() {
       </header>
 
       <main className="max-w-md mx-auto px-5 pb-16">
+        {status === "success" && (
+          <div className="bg-success/10 border border-success/30 rounded-2xl p-4 text-center text-success text-sm mb-4">
+            {dict.donate.thankYou}
+          </div>
+        )}
+        {status === "cancelled" && (
+          <div className="bg-sand-dark/40 rounded-2xl p-4 text-center text-ink/70 text-sm mb-4">
+            {dict.donate.cancelled}
+          </div>
+        )}
+
         {campaigns.length === 0 ? (
           <p className="text-center text-ink/60 text-lg py-12">{dict.donate.noActiveCampaigns}</p>
         ) : (
@@ -155,21 +216,67 @@ export default function DonatePage() {
               className="w-full bg-card rounded-xl px-4 py-4 text-lg border border-sand-dark mb-6"
             />
 
-            {/* Honest placeholder — payment integration not yet wired up. */}
-            <div className="bg-sand-dark/40 rounded-2xl p-4 text-center text-ink/70 text-sm mb-4">
-              {dict.donate.comingSoon}
-            </div>
+            {/* Donor details */}
+            <input
+              type="text"
+              placeholder={dict.donate.name}
+              aria-label={dict.donate.name}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full bg-card rounded-xl px-4 py-3.5 border border-sand-dark mb-3"
+            />
+            <input
+              type="email"
+              placeholder={dict.donate.email}
+              aria-label={dict.donate.email}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-card rounded-xl px-4 py-3.5 border border-sand-dark mb-3"
+            />
+            <label className="flex items-center gap-2 text-sm text-ink/70 mb-6">
+              <input
+                type="checkbox"
+                checked={requestTaxReceipt}
+                onChange={(e) => setRequestTaxReceipt(e.target.checked)}
+                className="w-4 h-4"
+              />
+              {dict.donate.requestTaxReceipt}
+            </label>
+
+            {notConfigured && (
+              <div className="bg-sand-dark/40 rounded-2xl p-4 text-center text-ink/70 text-sm mb-4">
+                {dict.donate.comingSoon}
+              </div>
+            )}
+            {checkoutError && (
+              <p className="text-urgent text-sm text-center mb-4" role="alert">
+                {checkoutError}
+              </p>
+            )}
 
             <button
-              disabled
-              className="w-full flex items-center justify-center gap-2 py-4 rounded-full bg-night-teal/40 text-sand font-medium text-lg cursor-not-allowed"
+              onClick={handleDonate}
+              disabled={!finalAmount || finalAmount <= 0 || submitting}
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-full bg-night-teal text-sand font-medium text-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-night-teal-light transition-colors"
             >
               <HandCoins className="w-5 h-5" />
-              {finalAmount ? `${dict.donate.donateNow} — $${finalAmount}` : dict.donate.donateNow}
+              {submitting
+                ? dict.common.saving
+                : finalAmount
+                ? `${dict.donate.continueToPay} — $${finalAmount}`
+                : dict.donate.continueToPay}
             </button>
           </>
         )}
       </main>
     </div>
+  );
+}
+
+export default function DonatePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-sand" />}>
+      <DonatePageContent />
+    </Suspense>
   );
 }
