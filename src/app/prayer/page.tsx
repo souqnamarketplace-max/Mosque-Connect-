@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import BottomNav from '@/components/BottomNav';
+import FooterNav from '@/components/FooterNav';
 
 interface PrayerRow { adhan: string; iqama?: string; }
 interface JumuahSlot { start: string; end: string | null; }
@@ -239,7 +239,7 @@ export default function PrayerPage() {
         )}
       </section>
 
-      <BottomNav active="prayer" />
+      <FooterNav />
 
       <style>{styles}</style>
     </main>

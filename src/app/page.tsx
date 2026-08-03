@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
-import BottomNav from '@/components/BottomNav';
+import FooterNav from '@/components/FooterNav';
 import MosqueHeroIllustration from '@/components/MosqueHeroIllustration';
 import DeviceInitializer from '@/components/DeviceInitializer';
 import EmergencyBanner from '@/components/EmergencyBanner';
@@ -212,7 +212,7 @@ export default function HomePage() {
         </span>
       </Link>
 
-      <BottomNav active="home" />
+      <FooterNav />
       <style>{css}</style>
     </main>
   );
