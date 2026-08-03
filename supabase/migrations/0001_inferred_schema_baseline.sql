@@ -141,7 +141,7 @@ create table if not exists prayer_times (
 create table if not exists iqama_times (
   id uuid primary key default gen_random_uuid(),
   mosque_id uuid not null references mosques(id) on delete cascade,
-  iqama_date date,
+  iqama_date date not null,
   fajr time,
   dhuhr time,
   asr time,
@@ -150,7 +150,8 @@ create table if not exists iqama_times (
   is_jumuah boolean not null default false,
   jumuah_khutbah_time time,
   notes text,
-  updated_by uuid references auth.users(id)
+  updated_by uuid references auth.users(id),
+  unique (mosque_id, iqama_date)
 );
 
 create table if not exists ramadan_schedule (

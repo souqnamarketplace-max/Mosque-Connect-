@@ -21,6 +21,8 @@ interface HomeData {
 interface FeaturedDua {
   text: string;
 }
+interface JumuahSlot { start: string; end: string | null; }
+interface JumuahInfo { first: JumuahSlot | null; second: JumuahSlot | null; }
 
 const ORDER = ['fajr','dhuhr','asr','maghrib','isha'] as const;
 
@@ -33,6 +35,7 @@ function fmt12(t?: string) {
 export default function HomePage() {
   const { dict, language } = useI18n();
   const [times, setTimes] = useState<PrayerTimes|null>(null);
+  const [jumuah, setJumuah] = useState<JumuahInfo|null>(null);
   const [home,  setHome]  = useState<HomeData|null>(null);
   const [dua,   setDua]   = useState<FeaturedDua|null>(null);
   const [tick,  setTick]  = useState(0);
@@ -44,8 +47,30 @@ export default function HomePage() {
 
   useEffect(() => {
     fetch('/api/home').then(r=>r.ok?r.json():null).then(d=>d&&setHome(d)).catch(()=>{});
-    fetch('/api/prayer-times/today').then(r=>r.ok?r.json():null).then(d=>d?.times&&setTimes(d.times)).catch(()=>{});
   }, []);
+
+  // Iqama times take priority per prayer (what congregants actually go by);
+  // any prayer without a set iqama for the day falls back to its Adhan time.
+  useEffect(() => {
+    if (!home?.mosqueId) return;
+    fetch(`/api/prayer-times/today?mosque_id=${home.mosqueId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (!d?.adhan) return;
+        const iqama = d.iqama ?? {};
+        setTimes({
+          fajr: iqama.fajr ?? d.adhan.fajr,
+          dhuhr: iqama.dhuhr ?? d.adhan.dhuhr,
+          asr: iqama.asr ?? d.adhan.asr,
+          maghrib: iqama.maghrib ?? d.adhan.maghrib,
+          isha: iqama.isha ?? d.adhan.isha,
+          sunrise: d.adhan.sunrise,
+          sunset: d.adhan.maghrib,
+        });
+        setJumuah(d.isJumuah ? d.jumuah ?? null : null);
+      })
+      .catch(() => {});
+  }, [home?.mosqueId]);
 
   useEffect(() => {
     fetch(`/api/dua-content/featured?lang=${language}`)
@@ -141,6 +166,12 @@ export default function HomePage() {
           </h2>
           <p className="prayer-card__countdown">{next?.countdown ?? '--:--:--'}</p>
           <p className="prayer-card__time">{next ? `${fmt12(next.time)} (${dict.prayerPage.adhan})` : ''}</p>
+          {isFriday && next?.key==='dhuhr' && (jumuah?.first || jumuah?.second) && (
+            <p className="prayer-card__jumuah">
+              {jumuah.first && `1: ${fmt12(jumuah.first.start)}`}
+              {jumuah.second && ` · 2: ${fmt12(jumuah.second.start)}`}
+            </p>
+          )}
         </div>
         <div className="prayer-card__sun">
           <div className="sun-row"><span>🌅</span><div><small>{dict.prayerPage.sunrise}</small><strong>{fmt12(times?.sunrise)}</strong></div></div>
@@ -229,6 +260,7 @@ const css = `
 .prayer-card__name{font-family:var(--font-display);font-size:1.6rem;font-weight:700;margin:0.1rem 0;}
 .prayer-card__countdown{font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:0.02em;margin:0;}
 .prayer-card__time{font-size:0.75rem;opacity:0.85;margin:0.1rem 0 0;}
+.prayer-card__jumuah{font-size:0.72rem;opacity:0.85;margin:0.2rem 0 0;color:var(--color-gold);}
 .prayer-card__sun{display:flex;flex-direction:column;gap:0.6rem;border-left:1px solid rgba(255,255,255,0.2);padding-left:0.75rem;}
 [dir="rtl"] .prayer-card__sun{border-left:none;border-right:1px solid rgba(255,255,255,0.2);padding-left:0;padding-right:0.75rem;}
 .sun-row{display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;}

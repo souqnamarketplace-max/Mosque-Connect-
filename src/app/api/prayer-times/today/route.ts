@@ -55,7 +55,9 @@ export async function GET(request: NextRequest) {
 
   const { data: iqamaRow } = await supabase
     .from("iqama_times")
-    .select("fajr, dhuhr, asr, maghrib, isha, is_jumuah, jumuah_khutbah_time")
+    .select(
+      "fajr, dhuhr, asr, maghrib, isha, is_jumuah, jumuah_khutbah_time, jumuah_1_start, jumuah_1_end, jumuah_2_start, jumuah_2_end"
+    )
     .eq("mosque_id", mosque.id)
     .eq("iqama_date", dateStr)
     .single();
@@ -100,5 +102,11 @@ export async function GET(request: NextRequest) {
       : null,
     isJumuah: iqamaRow?.is_jumuah ?? false,
     khutbahTime: iqamaRow?.jumuah_khutbah_time ?? null,
+    jumuah: iqamaRow?.is_jumuah
+      ? {
+          first: iqamaRow.jumuah_1_start ? { start: iqamaRow.jumuah_1_start, end: iqamaRow.jumuah_1_end } : null,
+          second: iqamaRow.jumuah_2_start ? { start: iqamaRow.jumuah_2_start, end: iqamaRow.jumuah_2_end } : null,
+        }
+      : null,
   });
 }
