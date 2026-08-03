@@ -8,13 +8,15 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import BottomNav from '@/components/BottomNav';
+import FooterNav from '@/components/FooterNav';
 
 interface PrayerRow { adhan: string; iqama?: string; }
+interface JumuahSlot { start: string; end: string | null; }
 interface DayTimes {
   fajr: PrayerRow; dhuhr: PrayerRow; asr: PrayerRow; maghrib: PrayerRow; isha: PrayerRow;
   sunrise?: string; sunset?: string;
   hijri?: string;
+  jumuah?: { first: JumuahSlot | null; second: JumuahSlot | null } | null;
 }
 
 const ORDER = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'] as const;
@@ -40,9 +42,28 @@ export default function PrayerPage() {
   }, []);
 
   useEffect(() => {
-    fetch('/api/prayer-times/today?detail=full')
+    fetch('/api/home')
       .then(r => (r.ok ? r.json() : null))
-      .then(d => d?.day && setDay(d.day))
+      .then(home => {
+        if (!home?.mosqueId) return;
+        return fetch(`/api/prayer-times/today?mosque_id=${home.mosqueId}`)
+          .then(r => (r.ok ? r.json() : null))
+          .then(d => {
+            if (!d?.adhan) return;
+            const iqama = d.iqama ?? {};
+            setDay({
+              fajr: { adhan: d.adhan.fajr, iqama: iqama.fajr },
+              dhuhr: { adhan: d.adhan.dhuhr, iqama: iqama.dhuhr },
+              asr: { adhan: d.adhan.asr, iqama: iqama.asr },
+              maghrib: { adhan: d.adhan.maghrib, iqama: iqama.maghrib },
+              isha: { adhan: d.adhan.isha, iqama: iqama.isha },
+              sunrise: d.adhan.sunrise,
+              sunset: d.adhan.maghrib,
+              hijri: home.hijriDate,
+              jumuah: d.isJumuah ? d.jumuah ?? null : null,
+            });
+          });
+      })
       .catch(() => {});
   }, []);
 
@@ -205,9 +226,20 @@ export default function PrayerPage() {
             </div>
           );
         })}
+
+        {isFriday && (day?.jumuah?.first || day?.jumuah?.second) && (
+          <div className="sched__jumuah-detail">
+            {day.jumuah?.first && (
+              <span>1st Jumu&apos;ah: {fmt12(day.jumuah.first.start)}{day.jumuah.first.end ? `–${fmt12(day.jumuah.first.end)}` : ''}</span>
+            )}
+            {day.jumuah?.second && (
+              <span>2nd Jumu&apos;ah: {fmt12(day.jumuah.second.start)}{day.jumuah.second.end ? `–${fmt12(day.jumuah.second.end)}` : ''}</span>
+            )}
+          </div>
+        )}
       </section>
 
-      <BottomNav active="prayer" />
+      <FooterNav />
 
       <style>{styles}</style>
     </main>
@@ -316,4 +348,9 @@ const styles = `
   border: none; background: #f2efe9; cursor: pointer; font-size: 1rem;
 }
 .sched__bell--off { opacity: 0.45; }
+.sched__jumuah-detail {
+  display: flex; flex-direction: column; gap: 0.2rem;
+  padding: 0.75rem 1rem; font-size: 0.8125rem; color: #2d6a4f; font-weight: 600;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
 `;

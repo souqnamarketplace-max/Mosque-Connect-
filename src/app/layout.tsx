@@ -5,6 +5,7 @@ import { getServerDict } from "@/lib/i18n/getServerDict";
 import { getOnboardingState } from "@/lib/onboardingState";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import ThemeSync from "@/components/ThemeSync";
+import PushPermissionPrompt from "@/components/push/PushPermissionPrompt";
 
 export const metadata: Metadata = {
   title: "Masjid Connect",
@@ -53,6 +54,7 @@ export default async function RootLayout({
         <I18nProvider>{children}</I18nProvider>
         <ServiceWorkerRegister />
         <ThemeSync serverTheme={theme} />
+        <PushPermissionPrompt />
       </body>
     </html>
   );

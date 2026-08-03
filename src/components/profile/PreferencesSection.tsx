@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface Province { id: string; name: string; name_ar: string; name_ur: string; code: string; }
@@ -11,10 +10,17 @@ interface Mosque   { id: string; name: string; address: string; city_id: string;
 type Lang = 'en' | 'ar' | 'ur';
 
 interface Props {
-  /** Current language – read from cookie by the parent server component */
+  /** Current language */
   currentLang: Lang;
   /** Currently selected primary mosque id */
   currentMosqueId: string | null;
+  /** Called after the person picks a new language — parent updates the
+   * `mc_language` cookie (via useI18n().setLanguage, the app-wide source of
+   * truth) and re-renders in the new language. */
+  onLanguageChange: (lang: Lang) => void;
+  /** Called after the mosque is saved server-side, so the parent can refresh
+   * its own display of the current mosque. */
+  onMosqueChange?: (mosqueId: string, mosqueName: string) => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -25,9 +31,7 @@ const LANG_LABELS: Record<Lang, { label: string; native: string }> = {
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function PreferencesSection({ currentLang, currentMosqueId }: Props) {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
+export default function PreferencesSection({ currentLang, currentMosqueId, onLanguageChange, onMosqueChange }: Props) {
 
   // Language
   const [lang, setLang] = useState<Lang>(currentLang);
@@ -50,10 +54,10 @@ export default function PreferencesSection({ currentLang, currentMosqueId }: Pro
 
   // ── Load provinces once ───────────────────────────────────────────────────
   useEffect(() => {
-    fetch('/api/onboarding/provinces')
+    fetch('/api/provinces')
       .then(r => r.json())
       .then(data => {
-        setProvinces(data.provinces ?? []);
+        setProvinces(Array.isArray(data) ? data : []);
         setLoadingProvinces(false);
       })
       .catch(() => setLoadingProvinces(false));
@@ -65,29 +69,31 @@ export default function PreferencesSection({ currentLang, currentMosqueId }: Pro
     fetch(`/api/onboarding/mosque-location?mosque_id=${currentMosqueId}`)
       .then(r => r.json())
       .then(data => {
-        if (data.province_id) setSelectedProvince(data.province_id);
-        if (data.city_id)     setSelectedCity(data.city_id);
+        if (data.province_id) { setSelectedProvince(data.province_id); setLoadingCities(true); }
+        if (data.city_id)     { setSelectedCity(data.city_id); setLoadingMosques(true); }
       })
       .catch(() => {});
   }, [currentMosqueId]);
 
   // ── Load cities when province changes ────────────────────────────────────
+  // (loadingCities is flipped true by whatever set selectedProvince — the
+  // province <select> onChange or the pre-select effect above — so this
+  // effect only ever resolves it, never sets it, satisfying the
+  // no-sync-setState-in-effect-body rule.)
   useEffect(() => {
-    if (!selectedProvince) { setCities([]); setSelectedCity(''); setMosques([]); return; }
-    setLoadingCities(true);
-    fetch(`/api/onboarding/cities?province_id=${selectedProvince}`)
+    if (!selectedProvince) return;
+    fetch(`/api/cities?province_id=${selectedProvince}`)
       .then(r => r.json())
-      .then(data => { setCities(data.cities ?? []); setLoadingCities(false); })
+      .then(data => { setCities(Array.isArray(data) ? data : []); setLoadingCities(false); })
       .catch(() => setLoadingCities(false));
   }, [selectedProvince]);
 
   // ── Load mosques when city changes ───────────────────────────────────────
   useEffect(() => {
-    if (!selectedCity) { setMosques([]); return; }
-    setLoadingMosques(true);
-    fetch(`/api/onboarding/mosques?city_id=${selectedCity}`)
+    if (!selectedCity) return;
+    fetch(`/api/mosques?city_id=${selectedCity}`)
       .then(r => r.json())
-      .then(data => { setMosques(data.mosques ?? []); setLoadingMosques(false); })
+      .then(data => { setMosques(Array.isArray(data) ? data : []); setLoadingMosques(false); })
       .catch(() => setLoadingMosques(false));
   }, [selectedCity]);
 
@@ -95,9 +101,7 @@ export default function PreferencesSection({ currentLang, currentMosqueId }: Pro
   function handleLangChange(newLang: Lang) {
     if (newLang === lang) return;
     setLang(newLang);
-    // Write cookie then reload so server components re-render in new language
-    document.cookie = `mc_locale=${newLang};path=/;max-age=31536000;SameSite=Lax`;
-    startTransition(() => { router.refresh(); });
+    onLanguageChange(newLang);
   }
 
   // ── Mosque save ───────────────────────────────────────────────────────────
@@ -106,15 +110,19 @@ export default function PreferencesSection({ currentLang, currentMosqueId }: Pro
     setSavingMosque(true);
     setError(null);
     try {
-      const res = await fetch('/api/user-preferences/mosque', {
-        method: 'PATCH',
+      // /api/onboarding is the app-wide source of truth for the selected
+      // mosque: it sets the mc_mosque_id cookie (read by prayer times, the
+      // home screen, etc.) and best-effort upserts user_mosque_subscriptions.
+      const res = await fetch('/api/onboarding', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mosque_id: selectedMosque }),
+        body: JSON.stringify({ mosqueId: selectedMosque }),
       });
       if (!res.ok) throw new Error('Failed to save');
+      const mosque = mosques.find(m => m.id === selectedMosque);
       setSavedMosque(true);
       setTimeout(() => setSavedMosque(false), 3000);
-      startTransition(() => router.refresh());
+      onMosqueChange?.(selectedMosque, mosque?.name ?? '');
     } catch {
       setError('Could not save mosque. Please try again.');
     } finally {
@@ -178,7 +186,16 @@ export default function PreferencesSection({ currentLang, currentMosqueId }: Pro
         <select
           className="pref-select"
           value={selectedProvince}
-          onChange={e => { setSelectedProvince(e.target.value); setSelectedCity(''); setSelectedMosque(''); setSearch(''); }}
+          onChange={e => {
+            const value = e.target.value;
+            setSelectedProvince(value);
+            setSelectedCity('');
+            setSelectedMosque('');
+            setSearch('');
+            setCities([]);
+            setMosques([]);
+            setLoadingCities(!!value);
+          }}
           disabled={loadingProvinces}
         >
           <option value="">
@@ -200,7 +217,14 @@ export default function PreferencesSection({ currentLang, currentMosqueId }: Pro
             <select
               className="pref-select"
               value={selectedCity}
-              onChange={e => { setSelectedCity(e.target.value); setSelectedMosque(''); setSearch(''); }}
+              onChange={e => {
+                const value = e.target.value;
+                setSelectedCity(value);
+                setSelectedMosque('');
+                setSearch('');
+                setMosques([]);
+                setLoadingMosques(!!value);
+              }}
               disabled={loadingCities}
             >
               <option value="">

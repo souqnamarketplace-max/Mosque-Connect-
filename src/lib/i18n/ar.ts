@@ -48,6 +48,7 @@ const ar: TranslationDict = {
     greetingMorning: "صباح الخير",
     greetingAfternoon: "مساء الخير",
     greetingEvening: "مساء الخير",
+    greeting: "السلام عليكم",
     weather: {
       conditions: {
         clearSky: "سماء صافية",
@@ -177,6 +178,8 @@ const ar: TranslationDict = {
     requestTaxReceipt: "طلب إيصال ضريبي",
     continueToPay: "الاستمرار للدفع",
     comingSoon: "الدفع عبر الإنترنت قيد الإعداد. يرجى التواصل مع المسجد مباشرة للتبرع حالياً.",
+    thankYou: "جزاكم الله خيراً — تم استلام تبرعكم. تقبل الله منكم.",
+    cancelled: "تم إلغاء عملية الدفع. لم يتم إجراء أي دفعة.",
     back: "رجوع",
   },
   events: {
@@ -256,6 +259,14 @@ const ar: TranslationDict = {
   qiblaStrip: {
     direction: "اتجاه القبلة",
     distance: "مسافة القبلة",
+  },
+  duas: {
+    title: "دعاء اليوم",
+    transliteration: "النقحرة",
+    source: "المصدر",
+    categories: "الفئات",
+    empty: "لا يوجد محتوى دعاء متاح حاليًا.",
+    back: "رجوع",
   },
   community: {
     title: "المجتمع",

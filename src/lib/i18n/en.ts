@@ -46,6 +46,7 @@ const en = {
     greetingMorning: "Good morning",
     greetingAfternoon: "Good afternoon",
     greetingEvening: "Good evening",
+    greeting: "Assalamu Alaikum",
     weather: {
       conditions: {
         clearSky: "Clear Sky",
@@ -175,6 +176,8 @@ const en = {
     requestTaxReceipt: "Request a tax receipt",
     continueToPay: "Continue to Payment",
     comingSoon: "Online payment is being set up. Please contact the mosque directly to donate for now.",
+    thankYou: "Jazakum Allah khair — your donation was received. May Allah accept it.",
+    cancelled: "Checkout was cancelled. No payment was made.",
     back: "Back",
   },
   events: {
@@ -254,6 +257,14 @@ const en = {
   qiblaStrip: {
     direction: "Qibla Direction",
     distance: "Qibla Distance",
+  },
+  duas: {
+    title: "Daily Dua",
+    transliteration: "Transliteration",
+    source: "Source",
+    categories: "Categories",
+    empty: "No dua content available right now.",
+    back: "Back",
   },
   community: {
     title: "Community",

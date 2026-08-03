@@ -8,8 +8,10 @@ import { AdminMosque } from "@/lib/hooks/useAdminSession";
 
 const TABS = [
   { href: "/admin/dashboard/iqama", label: "Iqama Times" },
+  { href: "/admin/dashboard/standing-schedule", label: "Standing Schedule" },
   { href: "/admin/dashboard/ramadan", label: "Ramadan" },
   { href: "/admin/dashboard/announcements", label: "Announcements" },
+  { href: "/admin/dashboard/emergency", label: "Emergency" },
   { href: "/admin/dashboard/events", label: "Events" },
   { href: "/admin/dashboard/classes", label: "Classes" },
   { href: "/admin/dashboard/volunteer", label: "Volunteer" },

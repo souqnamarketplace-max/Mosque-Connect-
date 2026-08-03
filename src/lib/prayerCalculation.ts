@@ -84,3 +84,16 @@ export function calculatePrayerTimes(config: MosqueCalcConfig, date: Date): Dail
 export function toTimeString(d: Date): string {
   return d.toISOString().substring(11, 19);
 }
+
+/** Adds (or subtracts, if negative) whole minutes to a "HH:MM:SS" or
+ * "HH:MM" time-of-day string, wrapping within a single day. Used to resolve
+ * standing-schedule Maghrib rules like "5 minutes after sunset" against a
+ * given day's real astronomical sunset time. */
+export function addMinutesToTimeString(time: string, minutes: number): string {
+  const [h, m, s] = time.split(":").map(Number);
+  const totalSeconds = (((h * 60 + m + minutes) * 60 + (s || 0)) % 86400 + 86400) % 86400;
+  const hh = Math.floor(totalSeconds / 3600);
+  const mm = Math.floor((totalSeconds % 3600) / 60);
+  const ss = totalSeconds % 60;
+  return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+}

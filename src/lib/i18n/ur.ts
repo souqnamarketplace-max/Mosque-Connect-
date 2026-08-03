@@ -48,6 +48,7 @@ const ur: TranslationDict = {
     greetingMorning: "صبح بخیر",
     greetingAfternoon: "دن بخیر",
     greetingEvening: "شام بخیر",
+    greeting: "السلام علیکم",
     weather: {
       conditions: {
         clearSky: "صاف آسمان",
@@ -177,6 +178,8 @@ const ur: TranslationDict = {
     requestTaxReceipt: "ٹیکس رسید کی درخواست کریں",
     continueToPay: "ادائیگی کی طرف جائیں",
     comingSoon: "آن لائن ادائیگی تیار کی جا رہی ہے۔ ابھی عطیہ دینے کے لیے براہ راست مسجد سے رابطہ کریں۔",
+    thankYou: "جزاکم اللہ خیراً — آپ کا عطیہ موصول ہو گیا۔ اللہ اسے قبول فرمائے۔",
+    cancelled: "ادائیگی منسوخ کر دی گئی۔ کوئی رقم منتقل نہیں ہوئی۔",
     back: "واپس",
   },
   events: {
@@ -256,6 +259,14 @@ const ur: TranslationDict = {
   qiblaStrip: {
     direction: "قبلہ کی سمت",
     distance: "قبلہ کا فاصلہ",
+  },
+  duas: {
+    title: "روزانہ دعا",
+    transliteration: "تلفظ",
+    source: "ماخذ",
+    categories: "زمرہ جات",
+    empty: "اس وقت کوئی دعا دستیاب نہیں ہے۔",
+    back: "واپس",
   },
   community: {
     title: "کمیونٹی",
