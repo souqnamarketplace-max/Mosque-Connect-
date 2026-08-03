@@ -31,11 +31,19 @@ export async function subscribeToPush(): Promise<PushSubscribeResult> {
       }));
 
     const subJson = subscription.toJSON();
-    await fetch("/api/push/subscribe", {
+    if (!subJson.endpoint || !subJson.keys?.p256dh || !subJson.keys?.auth) return "error";
+
+    const res = await fetch("/api/push/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ endpoint: subJson.endpoint, keys: subJson.keys }),
+      body: JSON.stringify({
+        endpoint: subJson.endpoint,
+        p256dh: subJson.keys.p256dh,
+        auth_key: subJson.keys.auth,
+        platform: "web",
+      }),
     });
+    if (!res.ok) return "error";
     return "subscribed";
   } catch {
     return "error";
