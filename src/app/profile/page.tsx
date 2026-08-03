@@ -17,6 +17,17 @@ interface CurrentSettings {
 
 const LANGUAGE_LABELS: Record<string, string> = { en: "English", ar: "العربية", ur: "اردو" };
 
+/** Reads the mc_theme cookie set by setTheme() in src/lib/onboardingState.ts
+ * — mirrors I18nProvider's readLanguageCookie() pattern, since this page's
+ * theme buttons need to know the actual saved preference on mount rather
+ * than always starting at "system" regardless of what was chosen before. */
+function readThemeCookie(): "light" | "dark" | "system" {
+  if (typeof document === "undefined") return "system";
+  const match = document.cookie.match(/(?:^|; )mc_theme=([^;]+)/);
+  const value = match?.[1];
+  return value === "light" || value === "dark" ? value : "system";
+}
+
 export default function SettingsPage() {
   const router = useRouter();
   const { dict, language, setLanguage } = useI18n();
@@ -48,6 +59,7 @@ export default function SettingsPage() {
   ];
 
   useEffect(() => {
+    setThemeState(readThemeCookie());
     fetch("/api/onboarding/current")
       .then((res) => res.json())
       .then(setSettings)
